@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Leaflet xServer Example</title>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
+    <link rel="stylesheet" href="dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="lib/leaflet.iconlabel.css" />
+    <link rel="stylesheet" href="lib/L.Control.Sidebar.css" />
+    <link rel="stylesheet" href="lib/prism.css">
+    <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+    <div id="map" class="map"></div>
+    <div id="sidebar">
+        <h1>Leaflet Routing Machine @xServer internet</h1>
+		<div>
+            <div>Select time of day</div>
+			00:00h <input id="range" type="range" min="0" max="24" step="1" value="18" /> 24:00h
+			</div>
+			</div>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="dist/leaflet-routing-machine.js"></script>
+    <script src="lib/Control.Geocoder.js"></script>
+    <script src="lib/Control.Geocoder.ptv.js"></script>
+    <script src="lib/leaflet.iconlabel.js"></script>
+    <script src="lib/L.Control.Sidebar.js"></script>
+    <script src="lib/prism.js"></script>
+    <script src="lib/NonTiledLayer.js"></script>
+    <script src="lib/NonTiledLayer.WMS.js"></script>
+    <script src="lib/Leaflet.PtvLayer.js"></script>
+    <script src="lib/routing-machine-ptv.js"></script>
+    <script src="token.js"></script>
+    <script src="tools.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
