@@ -3,7 +3,7 @@ if (!token)
 
 var hour1 = 18;
 var hour2 = 6;
-var map = L.map('map');
+var map = L.map('map', {zoomControl: false});
 
 var attribution = '<a href="http://www.ptvgroup.com">PTV</a>, TOMTOM';
 var cluster = 'eu-n-test';
