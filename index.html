@@ -1,31 +1,57 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8"/>
-    <title>Leaflet xServer Example</title>
+    <meta charset="utf-8" />
+    <title>Feature Layer Labs</title>
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
     <link rel="stylesheet" href="dist/leaflet-routing-machine.css" />
     <link rel="stylesheet" href="lib/leaflet.iconlabel.css" />
-    <link rel="stylesheet" href="lib/L.Control.Sidebar.css" />
+    <link rel="stylesheet" href="lib/leaflet-sidebar.min.css" />
     <link rel="stylesheet" href="lib/prism.css">
     <link rel="stylesheet" href="index.css" />
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        html, body, #map {
+            height: 100%;
+            font: 10pt "Helvetica Neue", Arial, Helvetica, sans-serif;
+        }
+    </style>
 </head>
 <body>
-    <div id="map" class="map"></div>
-    <div id="sidebar">
-        <h1>Leaflet Routing Machine @xServer internet</h1>
-		<div>
-            <div>Select time of day</div>
-			00:00h <input id="range" type="range" min="0" max="24" step="1" value="18" /> 24:00h
-			</div>
-			</div>
+    <div id="sidebar" class="sidebar collapsed">
+        <!-- Nav tabs -->
+        <ul class="sidebar-tabs" role="tablist">
+            <li><a href="#home" role="tab"><i class="fa fa-flag"></i></a></li>
+        </ul>
+        <!-- Tab panes -->
+        <div class="sidebar-content active">
+            <div class="sidebar-pane" id="home">
+                <h3>This sample shows how the time of day influences the routing result
+                based on the level of service (LOS).</h3>
+                <div>You can change the waypoints by dragging them on the map or entering
+                an address at the address input field.</div>
+                <div>
+                    <div>Select time of day</div>
+                    00:00h <input id="range" type="range" min="0" max="24" step="1"  /> 24:00h
+                    <div>Select time of day for a second route</div>
+                    00:00h <input id="range2" type="range" min="0" max="24" step="1" /> 24:00h
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="map" class="sidebar-map"></div>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="dist/leaflet-routing-machine.js"></script>
     <script src="lib/Control.Geocoder.js"></script>
     <script src="lib/Control.Geocoder.ptv.js"></script>
     <script src="lib/leaflet.iconlabel.js"></script>
-    <script src="lib/L.Control.Sidebar.js"></script>
+    <script src="lib/leaflet-sidebar.min.js"></script>
     <script src="lib/prism.js"></script>
     <script src="lib/NonTiledLayer.js"></script>
     <script src="lib/NonTiledLayer.WMS.js"></script>
