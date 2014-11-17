@@ -56,8 +56,8 @@ range2.onchange = function () {
 
 var routingControl = L.Routing.control({
     plan: L.Routing.plan([
-		L.latLng(52.616390233045387, 13.348388671875),
-		L.latLng(52.540449426243796, 13.59283447265625)
+		L.latLng(49.01495, 8.38044),
+		L.latLng(49.01407, 8.42785)
     ], {
         waypointIcon: function (i) {
             return new L.Icon.Label.Default({ labelText: String.fromCharCode(65 + i) });
