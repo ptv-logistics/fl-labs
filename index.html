@@ -31,15 +31,58 @@
         <!-- Tab panes -->
         <div class="sidebar-content active">
             <div class="sidebar-pane" id="home">
-                <h3>This sample shows how the time of day influences the routing result
-                based on the level of service and truck restriction zones.</h3>
-                <div>You can change the waypoints by dragging them on the map or entering
-                an address at the address input field.</div>
+                <h3>
+                    This sample shows how the time of day influences the routing result
+                    based on the level of service and truck restriction zones.
+                </h3>
                 <div>
-					<div><input type="checkbox" id="enableSpeedPatterns" onchange="updateParams()">Speed Patterns</div>
-					<div><input type="checkbox" id="enableRestrictionZones" onchange="updateParams()">Restriction Zones</div>
+                    You can change the waypoints by dragging them on the map or entering
+                    an address at the address input field.
+                </div>
+                <div>
+                    <div><input type="checkbox" id="enableSpeedPatterns" onchange="updateParams()">Speed Patterns</div>
+                    <div><input type="checkbox" id="enableRestrictionZones" onchange="updateParams()">Restriction Zones</div>
                     <div>Select time of day</div>
                     00:00h <input id="range" type="range" min="0" max="24" step="1" onchange="updateParams()" /> 24:00h
+                    <div>
+                        Routing Profile
+                        <select id="routingProfile" onchange="updateParams()">
+                            <option>carfast</option>
+                            <option>carslow</option>
+                            <option>truckfast</option>
+                            <option>truckslow</option>
+                            <option>delivery</option>
+                            <option>emergency</option>
+                            <option>bicycle</option>
+                            <option>bicycle-oneway</option>
+                            <option>pedestrian</option>
+                        </select>
+                    </div>
+                    <div>
+                        Itinerary Language
+                        <select id="languageSelect" onchange="updateParams()">
+                            <option>EN</option>
+                            <option>DE</option>
+                            <option>FR</option>
+                            <option>NL</option>
+                            <option>RO</option>
+                            <option>DA</option>
+                            <option>PL</option>
+                            <option>CS</option>
+                            <option>SK</option>
+                            <option>SR</option>
+                            <option>BG</option>
+                            <option>SL</option>
+                            <option>HR</option>
+                            <option>x-ptv-BOS</option>
+                            <option>UK</option>
+                            <option>RU</option>
+                            <option>ES</option>
+                            <option>IT</option>
+                            <option>SV</option>
+                            <option>PT</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>

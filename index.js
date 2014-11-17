@@ -4,6 +4,9 @@ if (!token)
 var hour = 18;
 var enableSpeedPatterns = true;
 var enableRestrictionZones = true;
+var itineraryLanguage = 'EN';
+var routingProfile = 'truckfast';
+
 var map = L.map('map', {zoomControl: false});
 
 var attribution = '<a href="http://www.ptvgroup.com">PTV</a>, TOMTOM';
@@ -39,6 +42,8 @@ var fgLayer = new L.NonTiledLayer.WMS("https://xmap-" + cluster + ".cloud.ptvgro
 $('#range').attr("value", hour);
 $('#enableSpeedPatterns').attr("checked", enableSpeedPatterns);
 $('#enableRestrictionZones').attr("checked", enableRestrictionZones);
+$('#languageSelect').val(itineraryLanguage);
+$('#routingProfile').val(routingProfile);
 
 var sidebar = L.control.sidebar('sidebar').addTo(map);
 sidebar.open("home");
@@ -56,7 +61,9 @@ var updateParams = function() {
     hour = $('#range').val();
     enableSpeedPatterns = $('#enableSpeedPatterns').is(':checked');
     enableRestrictionZones = $('#enableRestrictionZones').is(':checked');
-	
+    itineraryLanguage = $('#languageSelect option:selected').val();
+    routingProfile = $('#routingProfile option:selected').val();
+
     bgLayer.redraw();
     routingControl.route();
 }
@@ -83,18 +90,22 @@ var routingControl = L.Routing.control({
     },
     router: L.Routing.ptv({
         token: token, beforeSend: function (request) {
-            var ro = {
+            request.options.push({
                 parameter: "START_TIME",
                 value: "2014-01-07T" + ((hour == 24) ? '00' : (hour >= 10) ? hour : '0' + hour) + ":00:00+02:00"
-            };
-            request.options.push(ro);
+            });
+
+            request.options.push({
+                parameter: "ROUTE_LANGUAGE",
+                value: itineraryLanguage
+            });
 
             request.callerContext.properties.push({
                 key: "ProfileXMLSnippet",			
                 value: buildProfile()
             });
 
-            request.callerContext.properties.push({ key: "Profile", value: "truckfast" });
+            request.callerContext.properties.push({ key: "Profile", value: routingProfile });
 			
             return request;
         }
