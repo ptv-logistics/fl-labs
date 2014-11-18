@@ -7,18 +7,17 @@ var enableRestrictionZones = true;
 var itineraryLanguage = 'EN';
 var routingProfile = 'truckfast';
 
-var map = L.map('map', {zoomControl: false});
+var map = L.map('map', { zoomControl: false });
 
 var attribution = '<a href="http://www.ptvgroup.com">PTV</a>, TOMTOM';
 var cluster = 'eu-n-test';
 
-// getXMapBaseLayers(cluster, "sandbox", token, attribution).addTo(map);
-//initialize layers
+//add tile layer
 var bgLayer = new L.PtvLayer.Tiled("https://xmap-" + cluster + ".cloud.ptvgroup.com", {
     token: token, beforeSend: function (request) {
         request.callerContext.properties[0] = { key: "Profile", value: "silkysand-bg" };
 
-        if (map.getZoom() < 10) // don't display los for low zoom levels
+        if (map.getZoom() < 10) // don't display feature layer for low zoom levels
             return request;
 
         request.mapParams.referenceTime = "2014-01-07T" + ((hour == 24) ? '00' : (hour >= 10) ? hour : '0' + hour) + ":00:00+02:00";
@@ -31,7 +30,7 @@ var bgLayer = new L.PtvLayer.Tiled("https://xmap-" + cluster + ".cloud.ptvgroup.
     }
 }).addTo(map);
 
-// add (non-tiled) label layer. Default - insert at overlayPane
+// add (non-tiled) label layer
 var fgLayer = new L.NonTiledLayer.WMS("https://xmap-" + cluster + ".cloud.ptvgroup.com" + '/WMS/WMS?xtok=' + token, {
     opacity: 1.0,
     layers: 'xmap-ajaxfg-silkysand',
@@ -48,23 +47,26 @@ $('#routingProfile').val(routingProfile);
 var sidebar = L.control.sidebar('sidebar').addTo(map);
 sidebar.open("home");
 
-var buildProfile = function() {
-	var template = '<Profile xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><FeatureLayer majorVersion=\"1\" minorVersion=\"0\"><GlobalSettings enableTimeDependency=\"true\"/><Themes><Theme id=\"PTV_RestrictionZones\" enabled=\"{enableRestrictionZones}\" priorityLevel=\"0\"></Theme><Theme id=\"PTV_SpeedPatterns\" enabled=\"{enableSpeedPatterns}\" priorityLevel=\"0\"/><Theme id=\"PTV_TimeZones\" enabled=\"true\" priorityLevel=\"0\"/></Themes></FeatureLayer><Routing majorVersion=\"2\" minorVersion=\"0\"><Course><AdditionalDataRules enabled=\"true\"/></Course></Routing></Profile>'
-	
-	template = template.replace("{enableRestrictionZones}", enableRestrictionZones);
-	template = template.replace("{enableSpeedPatterns}", enableSpeedPatterns);
-	
-	return template;
+var buildProfile = function () {
+    var template = '<Profile xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><FeatureLayer majorVersion=\"1\" minorVersion=\"0\"><GlobalSettings enableTimeDependency=\"true\"/><Themes><Theme id=\"PTV_RestrictionZones\" enabled=\"{enableRestrictionZones}\" priorityLevel=\"0\"></Theme><Theme id=\"PTV_SpeedPatterns\" enabled=\"{enableSpeedPatterns}\" priorityLevel=\"0\"/><Theme id=\"PTV_TimeZones\" enabled=\"true\" priorityLevel=\"0\"/></Themes></FeatureLayer><Routing majorVersion=\"2\" minorVersion=\"0\"><Course><AdditionalDataRules enabled=\"true\"/></Course></Routing></Profile>'
+
+    template = template.replace("{enableRestrictionZones}", enableRestrictionZones);
+    template = template.replace("{enableSpeedPatterns}", enableSpeedPatterns);
+
+    return template;
 }
 
-var updateParams = function() {
+var updateParams = function (refreshFeatureLayer) {
     hour = $('#range').val();
     enableSpeedPatterns = $('#enableSpeedPatterns').is(':checked');
     enableRestrictionZones = $('#enableRestrictionZones').is(':checked');
     itineraryLanguage = $('#languageSelect option:selected').val();
     routingProfile = $('#routingProfile option:selected').val();
 
-    bgLayer.redraw();
+    if (refreshFeatureLayer) {
+        bgLayer.redraw();
+    }
+
     routingControl.route();
 }
 
@@ -101,12 +103,12 @@ var routingControl = L.Routing.control({
             });
 
             request.callerContext.properties.push({
-                key: "ProfileXMLSnippet",			
+                key: "ProfileXMLSnippet",
                 value: buildProfile()
             });
 
             request.callerContext.properties.push({ key: "Profile", value: routingProfile });
-			
+
             return request;
         }
     }),

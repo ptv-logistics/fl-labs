@@ -32,18 +32,18 @@
         <div class="sidebar-content active">
             <div class="sidebar-pane" id="home">
                 <h3>
-                    This sample shows how the time of day influences the routing result
-                    based on the level of service and truck restriction zones.
+                    This sample shows how the level of service and truck restriction zones
+                    influence the routing result.
                 </h3>
                 <div>
                     You can change the waypoints by dragging them on the map or entering
                     an address at the address input field.
                 </div>
                 <div>
-                    <div><input type="checkbox" id="enableSpeedPatterns" onchange="updateParams()">Speed Patterns</div>
-                    <div><input type="checkbox" id="enableRestrictionZones" onchange="updateParams()">Restriction Zones</div>
+                    <div><input type="checkbox" id="enableSpeedPatterns" onchange="updateParams(true)">Speed Patterns</div>
+                    <div><input type="checkbox" id="enableRestrictionZones" onchange="updateParams(true)">Restriction Zones</div>
                     <div>Select time of day</div>
-                    00:00h <input id="range" type="range" min="0" max="24" step="1" onchange="updateParams()" /> 24:00h
+                    00:00h <input id="range" type="range" min="0" max="24" step="1" onchange="updateParams(true)" /> 24:00h
                     <div>
                         Routing Profile
                         <select id="routingProfile" onchange="updateParams()">
