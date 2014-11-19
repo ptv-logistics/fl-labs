@@ -14,7 +14,7 @@ var cluster = 'eu-n-test';
 
 //add tile layer
 var bgLayer = new L.PtvLayer.Tiled("https://xmap-" + cluster + ".cloud.ptvgroup.com", {
-    token: token, beforeSend: function (request) {
+    token: token, attribution: attribution, beforeSend: function (request) {
         request.callerContext.properties[0] = { key: "Profile", value: "silkysand-bg" };
 
         if (map.getZoom() < 10) // don't display feature layer for low zoom levels
@@ -35,7 +35,8 @@ var fgLayer = new L.NonTiledLayer.WMS("https://xmap-" + cluster + ".cloud.ptvgro
     opacity: 1.0,
     layers: 'xmap-ajaxfg-silkysand',
     format: 'image/png',
-    transparent: true
+    transparent: true,
+    attribution: attribution
 }).addTo(map);
 
 $('#range').attr("value", hour);
