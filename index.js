@@ -30,13 +30,18 @@ var bgLayer = new L.PtvLayer.Tiled("https://xmap-" + cluster + ".cloud.ptvgroup.
     }
 }).addTo(map);
 
+// create a separate pane for the xmap labels, so they are displayed on top of the route line
+// http://bl.ocks.org/rsudekum/5431771
+map._panes.labelPane = map._createPane('leaflet-top-pane', map.getPanes().shadowPane);
+
 // add (non-tiled) label layer
 var fgLayer = new L.NonTiledLayer.WMS("https://xmap-" + cluster + ".cloud.ptvgroup.com" + '/WMS/WMS?xtok=' + token, {
     opacity: 1.0,
     layers: 'xmap-ajaxfg-silkysand',
     format: 'image/png',
     transparent: true,
-    attribution: attribution
+    attribution: attribution,
+	pane: map._panes.labelPane
 }).addTo(map);
 
 $('#range').attr("value", hour);
@@ -116,3 +121,7 @@ var routingControl = L.Routing.control({
     routeWhileDragging: false,
     routeDragInterval: 1000
 }).addTo(map);
+
+	routingControl.on('routingerror', function(e){ 
+		alert(e.error.responseJSON.errorMessage);
+	});
