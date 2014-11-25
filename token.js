@@ -1,1 +1,1 @@
-var token = '602826264981627'; // insert your token here
+var token = ''; // insert your token here
