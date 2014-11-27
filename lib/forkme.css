@@ -32,7 +32,8 @@
   font-size: 13px;
   font-weight: 700;
   color: white;
-
+  pointer-events: auto;
+  
   /* Set the text properties */
   text-decoration: none;
   text-shadow: 0 -1px rgba(0,0,0,0.5);
@@ -59,6 +60,7 @@
   overflow: hidden;
   top: 0;
   z-index: 9999;
+  pointer-events: none;
 }
 
 .github-fork-ribbon-wrapper.fixed {
