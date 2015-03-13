@@ -7,7 +7,16 @@ var enableRestrictionZones = true;
 var itineraryLanguage = 'EN';
 var routingProfile = 'truckfast';
 
-var map = L.map('map', { zoomControl: false });
+var map = L.map('map', { 
+                contextmenu: true,
+                contextmenuWidth: 200,
+                contextmenuItems: [{
+                    text: 'Add Waypoint At Start',
+                    callback: function(ev) {routingControl.spliceWaypoints(0, 0, ev.latlng);}
+                },{
+                    text: 'Add Waypoint At End',
+                    callback: function(ev) {routingControl.spliceWaypoints(routingControl._plan._waypoints.length, 0, ev.latlng);}
+                }]});
 
 var attribution = '<a href="http://www.ptvgroup.com">PTV</a>, TOMTOM';
 var cluster = 'eu-n-test';
@@ -37,7 +46,7 @@ map._panes.labelPane = map._createPane('leaflet-top-pane', map.getPanes().shadow
 // add (non-tiled) label layer
 var fgLayer = new L.NonTiledLayer.WMS("https://xmap-" + cluster + ".cloud.ptvgroup.com" + '/WMS/WMS?xtok=' + token, {
     opacity: 1.0,
-    layers: 'xmap-ajaxfg-silkysand',
+    layers: 'xmap-silkysand-fg',
     format: 'image/png',
     transparent: true,
     attribution: attribution,
@@ -54,7 +63,7 @@ var sidebar = L.control.sidebar('sidebar').addTo(map);
 sidebar.open("home");
 
 var buildProfile = function () {
-    var template = '<Profile xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><FeatureLayer majorVersion=\"1\" minorVersion=\"0\"><GlobalSettings enableTimeDependency=\"true\"/><Themes><Theme id=\"PTV_RestrictionZones\" enabled=\"{enableRestrictionZones}\" priorityLevel=\"0\"></Theme><Theme id=\"PTV_SpeedPatterns\" enabled=\"{enableSpeedPatterns}\" priorityLevel=\"0\"/><Theme id=\"PTV_TimeZones\" enabled=\"true\" priorityLevel=\"0\"/></Themes></FeatureLayer><Routing majorVersion=\"2\" minorVersion=\"0\"><Course><AdditionalDataRules enabled=\"true\"/></Course></Routing></Profile>'
+    var template = '<Profile xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><FeatureLayer majorVersion=\"1\" minorVersion=\"0\"><GlobalSettings enableTimeDependency=\"true\"/><Themes><Theme id=\"PTV_RestrictionZones\" enabled=\"{enableRestrictionZones}\" priorityLevel=\"0\"></Theme><Theme id=\"PTV_SpeedPatterns\" enabled=\"{enableSpeedPatterns}\" priorityLevel=\"0\"/></Themes></FeatureLayer><Routing majorVersion=\"2\" minorVersion=\"0\"><Course><AdditionalDataRules enabled=\"true\"/></Course></Routing></Profile>'
 
     template = template.replace("{enableRestrictionZones}", enableRestrictionZones);
     template = template.replace("{enableSpeedPatterns}", enableSpeedPatterns);
@@ -81,9 +90,12 @@ var routingControl = L.Routing.control({
 		L.latLng(48.813194201165274, 9.2841339111328125),
 		L.latLng(48.694133170886325, 9.122772216796875)
     ], {
-        waypointIcon: function (i) {
-            return new L.Icon.Label.Default({ labelText: String.fromCharCode(65 + i) });
-        },
+            createMarker: function (i, wp) {
+                return L.marker(wp.latLng, {
+                    draggable: true,
+                    icon: new L.Icon.Label.Default({ labelText: String.fromCharCode(65 + i) })
+                });
+            },
         geocoder: L.Control.Geocoder.ptv({ token: token })
     }),
     lineOptions: {
