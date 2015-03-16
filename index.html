@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="lib/leaflet.iconlabel.css" />
     <link rel="stylesheet" href="lib/forkme.css" />
     <link rel="stylesheet" href="lib/leaflet-sidebar.min.css" />
-    <link rel="stylesheet" href="lib/leaflet.contextmenu.css">
     <link rel="stylesheet" href="index.css" />
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
     <style>
@@ -50,10 +49,13 @@
                     an address at the address input field.
                 </div>
                 <div>
-                    <div><input type="checkbox" id="enableSpeedPatterns" onchange="updateParams(true)">Speed Patterns</div>
-                    <div><input type="checkbox" id="enableRestrictionZones" onchange="updateParams(true)">Restriction Zones</div>
-                    <div>Select time of day</div>
-                    00:00h <input id="range" type="range" min="0" max="24" step="1" onchange="updateParams(true)" /> 24:00h
+                    Consider layers for routing:
+                    <div><input type="checkbox" id="enableTrafficIncidents" onchange="updateParams(false)">Traffic Incidents</div>
+                    <div><input type="checkbox" id="enableTruckAttributes" onchange="updateParams(false)">Truck Attributes</div>
+                    <div><input type="checkbox" id="enableSpeedPatterns" onchange="updateParams(false)">Speed Patterns</div>
+                    <div><input type="checkbox" id="enableRestrictionZones" onchange="updateParams(false)">Restriction Zones</div>
+                    <!--<div>Select time of day</div>
+                    00:00h <input id="range" type="range" min="0" max="24" step="1" onchange="updateParams(true)" /> 24:00h-->
                     <div>
                         Routing Profile
                         <select id="routingProfile" onchange="updateParams()">
@@ -105,7 +107,6 @@
     <script src="lib/Control.Geocoder.ptv.js"></script>
     <script src="lib/leaflet.iconlabel.js"></script>
     <script src="lib/leaflet-sidebar.min.js"></script>
-    <script src="lib/leaflet.contextmenu.js"></script>
     <script src="lib/NonTiledLayer.js"></script>
     <script src="lib/NonTiledLayer.WMS.js"></script>
     <script src="lib/Leaflet.PtvLayer.js"></script>
