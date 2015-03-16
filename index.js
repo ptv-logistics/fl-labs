@@ -9,7 +9,16 @@ var enableTruckAttributes = true;
 var itineraryLanguage = 'EN';
 var routingProfile = 'truckfast';
 
-var map = L.map('map', {});
+var map = L.map('map', {
+                contextmenu: true,
+                contextmenuWidth: 200,
+                contextmenuItems: [{
+                    text: 'Add Waypoint At Start',
+                    callback: function(ev) {routingControl.spliceWaypoints(0, 0, ev.latlng);}
+                },{
+                    text: 'Add Waypoint At End',
+                    callback: function(ev) {routingControl.spliceWaypoints(routingControl._plan._waypoints.length, 0, ev.latlng);}
+                }]});
 
 var attribution = '<a href="http://www.ptvgroup.com">PTV</a>, TOMTOM';
 var cluster = 'eu-n-test';
