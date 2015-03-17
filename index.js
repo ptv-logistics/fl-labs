@@ -15,10 +15,20 @@ var map = L.map('map', {
                 contextmenuWidth: 200,
                 contextmenuItems: [{
                     text: 'Add Waypoint At Start',
-                    callback: function(ev) {routingControl.spliceWaypoints(0, 0, ev.latlng);}
+                    callback: function (ev) {
+                        if (routingControl._plan._waypoints[0].latLng)
+                            routingControl.spliceWaypoints(0, 0, ev.latlng);
+                        else
+                            routingControl.spliceWaypoints(0, 1, ev.latlng);
+                    }
                 },{
                     text: 'Add Waypoint At End',
-                    callback: function(ev) {routingControl.spliceWaypoints(routingControl._plan._waypoints.length, 0, ev.latlng);}
+                    callback: function(ev) {
+                        if (routingControl._plan._waypoints[routingControl._plan._waypoints.length-1].latLng)
+                            routingControl.spliceWaypoints(routingControl._plan._waypoints.length, 0, ev.latlng);
+                        else
+                            routingControl.spliceWaypoints(routingControl._plan._waypoints.length-1, 1, ev.latlng);
+                    }
                 }]});
 
 var attribution = '<a href="http://www.ptvgroup.com">PTV</a>, TOMTOM';
