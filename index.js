@@ -10,6 +10,7 @@ var itineraryLanguage = 'EN';
 var routingProfile = 'truckfast';
 
 var map = L.map('map', {
+                zoomControl: false,
                 contextmenu: true,
                 contextmenuWidth: 200,
                 contextmenuItems: [{
@@ -72,7 +73,9 @@ L.control.layers(baseLayers, {
     "Restriction Zones": restrictionZones,
     "Truck Attributes": truckAttributes,
     "Speed Patterns": speedPatterns
-}, { position: 'bottomleft' }).addTo(map);
+}, { position: 'topleft' }).addTo(map);
+
+new L.Control.Zoom({ position: 'bottomleft' }).addTo(map);
 
 $('#range').attr("value", hour);
 $('#enableSpeedPatterns').attr("checked", enableSpeedPatterns);
