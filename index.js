@@ -63,9 +63,9 @@ var speedPatterns = new L.PtvLayer.FeatureLayer({ name: 'PTV_SpeedPatterns' }).a
 
 var baseLayers = {
     "PTV classic": getLayers("ajax"),
-    "PTV sandbox": getLayers("sandbox").addTo(map),
+    "PTV sandbox": getLayers("sandbox"),
     "PTV silkysand": getLayers("silkysand"),
-    "PTV gravelpit": getLayers("gravelpit")
+    "PTV gravelpit": getLayers("gravelpit").addTo(map)
 };
 
 L.control.layers(baseLayers, {
