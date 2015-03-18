@@ -1,7 +1,7 @@
 if (!token)
     alert("you need an xServer internet token to run this sample!");
 
-var hour = 18;
+var hour = 0;
 var enableSpeedPatterns = true;
 var enableRestrictionZones = true;
 var enableTrafficIncidents = true;
@@ -46,8 +46,9 @@ var getLayers = function(profile) {
         token: token,
         attribution: attribution,
         profile: profile + "-bg",
-        beforeSend2: function(request) {
-//            request.mapParams.referenceTime = "2014-01-07T" + ((hour == 24) ? '00' : (hour >= 10) ? hour : '0' + hour) + ":00:00+02:00";
+        beforeSend2: function (request) {
+            if(hour)
+                request.mapParams.referenceTime = moment.utc().add(hour, 'hours').format();
         }
     });
 
@@ -58,7 +59,8 @@ var getLayers = function(profile) {
         profile: profile + "-fg",
         pane: map._panes.labelPane,
         beforeSend2: function (request) {
-//            request.mapParams.referenceTime = "2014-01-07T" + ((hour == 24) ? '00' : (hour >= 10) ? hour : '0' + hour) + ":00:00+02:00";
+            if(hour)
+                request.mapParams.referenceTime = moment.utc().add(hour, 'hour').format()
         }
     });
 
@@ -80,8 +82,8 @@ var baseLayers = {
 
 L.control.layers(baseLayers, {
     "Incidents": incidents,
-    "Restriction Zones": restrictionZones,
     "Truck Attributes": truckAttributes,
+    "Restriction Zones": restrictionZones,
     "Speed Patterns": speedPatterns
 }, { position: 'topleft' }).addTo(map);
 
@@ -109,6 +111,11 @@ var buildProfile = function () {
     return template;
 }
 
+var setNow = function () {
+    $('#range').val(0);
+    updateParams(true);
+}
+
 var updateParams = function (refreshFeatureLayer) {
     hour = $('#range').val();
     enableSpeedPatterns = $('#enableSpeedPatterns').is(':checked');
@@ -120,6 +127,7 @@ var updateParams = function (refreshFeatureLayer) {
 
     if (refreshFeatureLayer) {
         speedPatterns.redraw();
+        incidents.redraw();
     }
 
     routingControl.route();
@@ -150,10 +158,11 @@ var routingControl = L.Routing.control({
     },
     router: L.Routing.ptv({
         token: token, beforeSend: function (request) {
-            //request.options.push({
-            //    parameter: "START_TIME",
-            //    value: "2014-01-07T" + ((hour == 24) ? '00' : (hour >= 10) ? hour : '0' + hour) + ":00:00+02:00"
-            //});
+            if(hour)
+                request.options.push({
+                    parameter: "START_TIME",
+                    value: moment.utc().add(hour, 'hours').format()
+                });
 
             request.options.push({
                 parameter: "ROUTE_LANGUAGE",
