@@ -68,8 +68,8 @@ var getLayers = function(profile) {
 }
 
 var incidents = new L.PtvLayer.FeatureLayer({ name: 'PTV_TrafficIncidents' }).addTo(map);
-var restrictionZones = new L.PtvLayer.FeatureLayer({ name: 'PTV_RestrictionZones' }).addTo(map);
 var truckAttributes = new L.PtvLayer.FeatureLayer({ name: 'PTV_TruckAttributes' }).addTo(map);
+var restrictionZones = new L.PtvLayer.FeatureLayer({ name: 'PTV_RestrictionZones' }).addTo(map);
 var speedPatterns = new L.PtvLayer.FeatureLayer({ name: 'PTV_SpeedPatterns' }).addTo(map);
 //var preferredRoutes = new L.PtvLayer.FeatureLayer({ name: 'PTV_PreferredRoutes' }).addTo(map);
 
