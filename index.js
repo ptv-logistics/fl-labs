@@ -127,7 +127,7 @@ var updateParams = function (refreshFeatureLayer) {
 
     if (refreshFeatureLayer) {
         speedPatterns.redraw();
-        incidents.redraw();
+//        incidents.redraw();
     }
 
     routingControl.route();
