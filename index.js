@@ -10,26 +10,28 @@ var itineraryLanguage = 'EN';
 var routingProfile = 'truckfast';
 
 var map = L.map('map', {
-                zoomControl: false,
-                contextmenu: true,
-                contextmenuWidth: 200,
-                contextmenuItems: [{
-                    text: 'Add Waypoint At Start',
-                    callback: function (ev) {
-                        if (routingControl._plan._waypoints[0].latLng)
-                            routingControl.spliceWaypoints(0, 0, ev.latlng);
-                        else
-                            routingControl.spliceWaypoints(0, 1, ev.latlng);
-                    }
-                },{
-                    text: 'Add Waypoint At End',
-                    callback: function(ev) {
-                        if (routingControl._plan._waypoints[routingControl._plan._waypoints.length-1].latLng)
-                            routingControl.spliceWaypoints(routingControl._plan._waypoints.length, 0, ev.latlng);
-                        else
-                            routingControl.spliceWaypoints(routingControl._plan._waypoints.length-1, 1, ev.latlng);
-                    }
-                }]});
+    zoomControl: false,
+    contextmenu: true,
+    contextmenuWidth: 200,
+    contextmenuItems: [{
+        text: 'Add Waypoint At Start',
+        callback: function (ev) {
+            if (routingControl._plan._waypoints[0].latLng)
+                routingControl.spliceWaypoints(0, 0, ev.latlng);
+            else
+                routingControl.spliceWaypoints(0, 1, ev.latlng);
+        }
+    }, {
+        text: 'Add Waypoint At End',
+        callback: function (ev) {
+            if (routingControl._plan._waypoints[routingControl._plan._waypoints.length - 1].latLng)
+                routingControl.spliceWaypoints(routingControl._plan._waypoints.length, 0, ev.latlng);
+            else
+                routingControl.spliceWaypoints(routingControl._plan._waypoints.length - 1, 1, ev.latlng);
+        }
+    }]
+});
+
 
 var attribution = '<a href="http://www.ptvgroup.com">PTV</a>, TOMTOM';
 var cluster = 'eu-n-test';
@@ -38,28 +40,35 @@ var cluster = 'eu-n-test';
 // http://bl.ocks.org/rsudekum/5431771
 map._panes.labelPane = map._createPane('leaflet-top-pane', map.getPanes().shadowPane);
 
+map.setView([0,0], 0);
 
-var getLayers = function(profile) {
+/* Initialize the SVG layer */
+map._initPathRoot();
 
-//add tile layer
+/* We simply pick up the SVG from the map object */
+var svg = d3.select("#map").select("svg"),
+g = svg.append("g");
+
+var getLayers = function (profile) {
+    //add tile layer
     var bgLayer = new L.PtvLayer.FeatureLayerBg("https://xmap-eu-n-test.cloud.ptvgroup.com", {
         token: token,
         attribution: attribution,
         profile: profile + "-bg",
         beforeSend2: function (request) {
-            if(hour)
+            if (hour)
                 request.mapParams.referenceTime = moment.utc().add(hour, 'hours').format();
         }
     });
 
-//add fg layer
+    //add fg layer
     var fgLayer = new L.PtvLayer.FeatureLayerFg("https://xmap-eu-n-test.cloud.ptvgroup.com", {
         token: token,
         attribution: attribution,
         profile: profile + "-fg",
         pane: map._panes.labelPane,
         beforeSend2: function (request) {
-            if(hour)
+            if (hour)
                 request.mapParams.referenceTime = moment.utc().add(hour, 'hour').format()
         }
     });
@@ -127,11 +136,12 @@ var updateParams = function (refreshFeatureLayer) {
 
     if (refreshFeatureLayer) {
         speedPatterns.redraw();
-//        incidents.redraw();
+        //        incidents.redraw();
     }
 
     routingControl.route();
 }
+
 
 var routingControl = L.Routing.control({
     plan: L.Routing.plan([
@@ -157,8 +167,9 @@ var routingControl = L.Routing.control({
         ]
     },
     router: L.Routing.ptv({
-        token: token, beforeSend: function (request) {
-            if(hour)
+        token: token,
+        beforeSend: function (request) {
+            if (hour)
                 request.options.push({
                     parameter: "START_TIME",
                     value: moment.utc().add(hour, 'hours').format()
@@ -177,6 +188,9 @@ var routingControl = L.Routing.control({
             request.callerContext.properties.push({ key: "Profile", value: routingProfile });
 
             return request;
+        },
+        routesCalculated: function (responses) {
+            buildD3Animations(responses);
         }
     }),
     routeWhileDragging: false,

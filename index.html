@@ -25,6 +25,43 @@
         .leaflet-top-pane {
             pointer-events: none;
         }
+
+        xpath {
+            fill: yellow;
+            stroke-width: 2px;
+            stroke: red;
+            stroke-opacity: 1;
+        }
+
+        .travelMarker {
+            fill: yellow;
+            opacity: 0.75;
+        }
+
+        .waypoints {
+            fill: black;
+            opacity: 0;
+        }
+
+        }
+
+        .drinks {
+            stroke: black;
+            fill: red;
+        }
+
+        .lineConnect {
+            fill: none;
+            stroke: black;
+            opacity: 1;
+        }
+
+        .locnames {
+            fill: black;    
+            text-shadow: 1px 1px 1px #FFF, 3px 3px 5px #000;
+            font-weight: bold;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
@@ -107,6 +144,7 @@
     <div id="map" class="map"></div>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="lib/d3.min.js" charset="utf-8"></script>
     <script src="lib/leaflet-routing-machine.js"></script>
     <script src="lib/Control.Geocoder.js"></script>
     <script src="lib/Control.Geocoder.ptv.js"></script>
@@ -118,6 +156,7 @@
     <script src="lib/Leaflet.PtvLayer.js"></script>
     <script src="lib/routing-machine-ptv.js"></script>
     <script src="lib/moment.js"></script>
+    <script src="lib/animatedRoute.js"></script>
     <script src="token.js"></script>
     <script src="tools.js"></script>
     <script src="index.js"></script>
