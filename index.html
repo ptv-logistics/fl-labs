@@ -57,7 +57,7 @@
         }
 
         .locnames {
-            fill: black;    
+            fill: black;
             text-shadow: 1px 1px 1px #FFF, 3px 3px 5px #000;
             font-weight: bold;
             font-size: 13px;
@@ -74,17 +74,18 @@
         <!-- Nav tabs -->
         <ul class="sidebar-tabs" role="tablist">
             <li><a href="#home" role="tab"><i class="fa fa-flag"></i></a></li>
+            <li><a href="#about" role="tab"><i class="fa fa-info"></i></a></li>
         </ul>
         <!-- Tab panes -->
         <div class="sidebar-content active">
             <div class="sidebar-pane" id="home">
-                <h3>
+                <h2>
                     Feature Layer Labs
-                </h3>
-                <h4>
+                </h2>
+                <h3>
                     You can change the waypoints by dragging them on the map or entering
                     an address at the address input field.
-                </h4>
+                </h3>
                 <div>
                     <div style="margin: 10px 0px 10px 0px;">
                         <div>Consider layers for routing:</div>
@@ -166,6 +167,37 @@
                     <div>
                         <button onclick="replay()">Replay</button>
                     </div>
+                </div>
+            </div>
+            <div class="sidebar-pane" id="about">
+                <div>
+                    <p>
+                        <h2>Powered by</h2>
+                    </p>
+                    <p>
+                        <div>
+                            <a href="http://xserver.ptvgroup.com/de/produkte/ptv-xserver-internet/"><img src="https://avatars0.githubusercontent.com/u/8178291"></a>
+                            <h3>PTV xServer internet</h3>
+                        </div>
+                    </p>
+                    <p>
+                        <div>
+                            <a href="http://leafletjs.com/"><img src="http://leafletjs.com/docs/images/logo.png"></a>
+                            <h3>Leaflet</h3>
+                        </div>
+                    </p>
+                    <p>
+                        <div>
+                            <a href="http://www.liedman.net/leaflet-routing-machine/"><img src="http://www.liedman.net/leaflet-routing-machine/public/logo.svg"></a>
+                            <h3>Leaflet Routing Machine</h3>
+                        </div>
+                    </p>
+                    <p>
+                        <div>
+                            <a href="http://d3js.org"><img src="http://d3js.org/logo.svg"></a>
+                            <h3>Data Driven Documents</h3>
+                        </div>
+                    </p>
                 </div>
             </div>
         </div>
