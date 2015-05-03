@@ -112,6 +112,14 @@
                             <option>pedestrian</option>
                         </select>
                     </div>
+                    <div>
+                        <label for="alternativeRoutes">Alternative Routes</label>
+                        <select id="alternativeRoutes" onchange="updateParams()">
+                            <option>0</option>
+                            <option>1</option>
+                            <option>2</option>
+                        </select>
+                    </div>
                     <div style="margin: 10px 0px 10px 0px;">
                         Itinerary Language
                         <select id="languageSelect" onchange="updateParams()">
@@ -136,6 +144,27 @@
                             <option>SV</option>
                             <option>PT</option>
                         </select>
+                    </div>
+                    <div style="margin: 10px 0px 10px 0px;">
+                        Replay Speed
+                        <select id="replaySpeed" onchange="replay()">
+                            <option>1</option>
+                            <option>2.5</option>
+                            <option>5</option>
+                            <option>10</option>
+                            <option>25</option>
+                            <option>50</option>
+                            <option>100</option>
+                            <option>250</option>
+                            <option>500</option>
+                            <option>1000</option>
+                            <option>2500</option>
+                            <option>5000</option>
+                            <option>10000</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button onclick="replay()">Replay</button>
                     </div>
                 </div>
             </div>

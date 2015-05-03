@@ -8,6 +8,9 @@ var enableTrafficIncidents = true;
 var enableTruckAttributes = true;
 var itineraryLanguage = 'EN';
 var routingProfile = 'truckfast';
+var alternativeRoutes = 0;
+var replaySpeed = 1000;
+var responses = null;
 
 var map = L.map('map', {
     zoomControl: false,
@@ -42,12 +45,10 @@ map._panes.labelPane = map._createPane('leaflet-top-pane', map.getPanes().shadow
 
 map.setView([0,0], 0);
 
-/* Initialize the SVG layer */
-map._initPathRoot();
-
-/* We simply pick up the SVG from the map object */
-var svg = d3.select("#map").select("svg"),
-g = svg.append("g");
+var replay = function () {
+    replaySpeed = $('#replaySpeed option:selected').val();
+    buildD3Animations(responses, replaySpeed);
+}
 
 var getLayers = function (profile) {
     //add tile layer
@@ -105,6 +106,8 @@ $('#enableTrafficIncidents').attr("checked", enableTrafficIncidents);
 $('#enableTruckAttributes').attr("checked", enableTruckAttributes);
 $('#languageSelect').val(itineraryLanguage);
 $('#routingProfile').val(routingProfile);
+$('#alternativeRoutes').val(alternativeRoutes);
+$('#replaySpeed').val(replaySpeed);
 
 var sidebar = L.control.sidebar('sidebar').addTo(map);
 sidebar.open("home");
@@ -133,12 +136,14 @@ var updateParams = function (refreshFeatureLayer) {
     enableTrafficIncidents = $('#enableTrafficIncidents').is(':checked');
     itineraryLanguage = $('#languageSelect option:selected').val();
     routingProfile = $('#routingProfile option:selected').val();
+    alternativeRoutes = $('#alternativeRoutes option:selected').val();
 
     if (refreshFeatureLayer) {
         speedPatterns.redraw();
         //        incidents.redraw();
     }
 
+    routingControl._router.options.numberOfAlternatives = alternativeRoutes;
     routingControl.route();
 }
 
@@ -167,7 +172,9 @@ var routingControl = L.Routing.control({
         ]
     },
     router: L.Routing.ptv({
+        serviceUrl: 'https://xroute-' + cluster + '.cloud.ptvgroup.com/xroute/rs/XRoute/',
         token: token,
+        numberOfAlternatives: alternativeRoutes,
         beforeSend: function (request) {
             if (hour)
                 request.options.push({
@@ -189,8 +196,9 @@ var routingControl = L.Routing.control({
 
             return request;
         },
-        routesCalculated: function (responses) {
-            buildD3Animations(responses);
+        routesCalculated: function (r) {
+            responses = r;
+            replay();
         }
     }),
     routeWhileDragging: false,
