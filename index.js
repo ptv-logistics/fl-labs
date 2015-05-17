@@ -9,7 +9,7 @@ var enableTruckAttributes = true;
 var itineraryLanguage = 'EN';
 var routingProfile = 'truckfast';
 var alternativeRoutes = 0;
-var replaySpeed = 1000;
+var replaySpeed = 250;
 var responses = null;
 
 var map = L.map('map', {
