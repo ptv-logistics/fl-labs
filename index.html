@@ -22,15 +22,20 @@
             font: 10pt "Helvetica Neue", Arial, Helvetica, sans-serif;
         }
 
-        .leaflet-top-pane {
-            pointer-events: none;
+        h1, p {
+            margin-top: 3em;
         }
 
-        xpath {
-            fill: yellow;
-            stroke-width: 2px;
-            stroke: red;
-            stroke-opacity: 1;
+        h2 {
+            margin-top: 2em;
+        }
+
+        h3 {
+            margin-top: 1em;
+        }
+
+        .leaflet-top-pane {
+            pointer-events: none;
         }
 
         .travelMarker {
@@ -43,24 +48,10 @@
             opacity: 0;
         }
 
-        }
-
-        .drinks {
-            stroke: black;
-            fill: red;
-        }
-
         .lineConnect {
             fill: none;
             stroke: black;
             opacity: 1;
-        }
-
-        .locnames {
-            fill: black;
-            text-shadow: 1px 1px 1px #FFF, 3px 3px 5px #000;
-            font-weight: bold;
-            font-size: 13px;
         }
     </style>
 </head>
@@ -176,25 +167,25 @@
                     </p>
                     <p>
                         <div>
-                            <a href="http://xserver.ptvgroup.com/de/produkte/ptv-xserver-internet/"><img src="https://avatars0.githubusercontent.com/u/8178291"></a>
+                            <a href="http://xserver.ptvgroup.com/de/produkte/ptv-xserver-internet/"><img src="./images/xserver.png"></a>
                             <h3>PTV xServer internet</h3>
                         </div>
                     </p>
                     <p>
                         <div>
-                            <a href="http://leafletjs.com/"><img src="http://leafletjs.com/docs/images/logo.png"></a>
+                            <a href="http://leafletjs.com/"><img src="./images/leaflet.png"></a>
                             <h3>Leaflet</h3>
                         </div>
                     </p>
                     <p>
                         <div>
-                            <a href="http://www.liedman.net/leaflet-routing-machine/"><img src="http://www.liedman.net/leaflet-routing-machine/public/logo.svg"></a>
+                            <a href="http://www.liedman.net/leaflet-routing-machine/"><img src="./images/lrm.svg"></a>
                             <h3>Leaflet Routing Machine</h3>
                         </div>
                     </p>
                     <p>
                         <div>
-                            <a href="http://d3js.org"><img src="http://d3js.org/logo.svg"></a>
+                            <a href="http://d3js.org"><img src="./images/d3.svg"></a>
                             <h3>Data Driven Documents</h3>
                         </div>
                     </p>
@@ -218,6 +209,7 @@
     <script src="lib/routing-machine-ptv.js"></script>
     <script src="lib/moment.js"></script>
     <script src="lib/animatedRoute.js"></script>
+    <script src="lib/d3layer.js"></script>
     <script src="token.js"></script>
     <script src="tools.js"></script>
     <script src="index.js"></script>
