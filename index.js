@@ -161,7 +161,8 @@ var routingControl = L.Routing.control({
                 icon: new L.Icon.Label.Default({ labelText: String.fromCharCode(65 + i) })
             });
         },
-        geocoder: L.Control.Geocoder.ptv({ token: token })
+        geocoder: L.Control.Geocoder.ptv({ token: token }),
+		reverseWaypoints: true
     }),
     lineOptions: {
         styles: [
