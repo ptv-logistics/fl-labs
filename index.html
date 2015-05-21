@@ -22,8 +22,36 @@
             font: 10pt "Helvetica Neue", Arial, Helvetica, sans-serif;
         }
 
+        h1, p {
+            margin-top: 3em;
+        }
+
+        h2 {
+            margin-top: 2em;
+        }
+
+        h3 {
+            margin-top: 1em;
+        }
+
         .leaflet-top-pane {
             pointer-events: none;
+        }
+
+        .travelMarker {
+            fill: yellow;
+            opacity: 0.75;
+        }
+
+        .waypoints {
+            fill: black;
+            opacity: 0;
+        }
+
+        .lineConnect {
+            fill: none;
+            stroke: black;
+            opacity: 1;
         }
     </style>
 </head>
@@ -37,17 +65,18 @@
         <!-- Nav tabs -->
         <ul class="sidebar-tabs" role="tablist">
             <li><a href="#home" role="tab"><i class="fa fa-flag"></i></a></li>
+            <li><a href="#about" role="tab"><i class="fa fa-info"></i></a></li>
         </ul>
         <!-- Tab panes -->
         <div class="sidebar-content active">
             <div class="sidebar-pane" id="home">
-                <h3>
+                <h2>
                     Feature Layer Labs
-                </h3>
-                <h4>
+                </h2>
+                <h3>
                     You can change the waypoints by dragging them on the map or entering
                     an address at the address input field.
-                </h4>
+                </h3>
                 <div>
                     <div style="margin: 10px 0px 10px 0px;">
                         <div>Consider layers for routing:</div>
@@ -75,6 +104,14 @@
                             <option>pedestrian</option>
                         </select>
                     </div>
+                    <div>
+                        <label for="alternativeRoutes">Alternative Routes</label>
+                        <select id="alternativeRoutes" onchange="updateParams()">
+                            <option>0</option>
+                            <option>1</option>
+                            <option>2</option>
+                        </select>
+                    </div>
                     <div style="margin: 10px 0px 10px 0px;">
                         Itinerary Language
                         <select id="languageSelect" onchange="updateParams()">
@@ -100,6 +137,58 @@
                             <option>PT</option>
                         </select>
                     </div>
+                    <div style="margin: 10px 0px 10px 0px;">
+                        Replay Speed
+                        <select id="replaySpeed" onchange="replay()">
+                            <option>1</option>
+                            <option>2.5</option>
+                            <option>5</option>
+                            <option>10</option>
+                            <option>25</option>
+                            <option>50</option>
+                            <option>100</option>
+                            <option>250</option>
+                            <option>500</option>
+                            <option>1000</option>
+                            <option>2500</option>
+                            <option>5000</option>
+                            <option>10000</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button onclick="replay()">Replay</button>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-pane" id="about">
+                <div>
+                    <p>
+                        <h2>Powered by</h2>
+                    </p>
+                    <p>
+                        <div>
+                            <a href="http://xserver.ptvgroup.com/de/produkte/ptv-xserver-internet/"><img src="./images/xserver.png"></a>
+                            <h3>PTV xServer internet</h3>
+                        </div>
+                    </p>
+                    <p>
+                        <div>
+                            <a href="http://leafletjs.com/"><img src="./images/leaflet.png"></a>
+                            <h3>Leaflet</h3>
+                        </div>
+                    </p>
+                    <p>
+                        <div>
+                            <a href="http://www.liedman.net/leaflet-routing-machine/"><img src="./images/lrm.svg"></a>
+                            <h3>Leaflet Routing Machine</h3>
+                        </div>
+                    </p>
+                    <p>
+                        <div>
+                            <a href="http://d3js.org"><img src="./images/d3.svg"></a>
+                            <h3>Data Driven Documents</h3>
+                        </div>
+                    </p>
                 </div>
             </div>
         </div>
@@ -107,6 +196,7 @@
     <div id="map" class="map"></div>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="lib/d3.min.js" charset="utf-8"></script>
     <script src="lib/leaflet-routing-machine.js"></script>
     <script src="lib/Control.Geocoder.js"></script>
     <script src="lib/Control.Geocoder.ptv.js"></script>
@@ -118,6 +208,8 @@
     <script src="lib/Leaflet.PtvLayer.js"></script>
     <script src="lib/routing-machine-ptv.js"></script>
     <script src="lib/moment.js"></script>
+    <script src="lib/animatedRoute.js"></script>
+    <script src="lib/d3layer.js"></script>
     <script src="token.js"></script>
     <script src="tools.js"></script>
     <script src="index.js"></script>

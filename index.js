@@ -8,28 +8,33 @@ var enableTrafficIncidents = true;
 var enableTruckAttributes = true;
 var itineraryLanguage = 'EN';
 var routingProfile = 'truckfast';
+var alternativeRoutes = 0;
+var replaySpeed = 250;
+var responses = null;
 
 var map = L.map('map', {
-                zoomControl: false,
-                contextmenu: true,
-                contextmenuWidth: 200,
-                contextmenuItems: [{
-                    text: 'Add Waypoint At Start',
-                    callback: function (ev) {
-                        if (routingControl._plan._waypoints[0].latLng)
-                            routingControl.spliceWaypoints(0, 0, ev.latlng);
-                        else
-                            routingControl.spliceWaypoints(0, 1, ev.latlng);
-                    }
-                },{
-                    text: 'Add Waypoint At End',
-                    callback: function(ev) {
-                        if (routingControl._plan._waypoints[routingControl._plan._waypoints.length-1].latLng)
-                            routingControl.spliceWaypoints(routingControl._plan._waypoints.length, 0, ev.latlng);
-                        else
-                            routingControl.spliceWaypoints(routingControl._plan._waypoints.length-1, 1, ev.latlng);
-                    }
-                }]});
+    zoomControl: false,
+    contextmenu: true,
+    contextmenuWidth: 200,
+    contextmenuItems: [{
+        text: 'Add Waypoint At Start',
+        callback: function (ev) {
+            if (routingControl._plan._waypoints[0].latLng)
+                routingControl.spliceWaypoints(0, 0, ev.latlng);
+            else
+                routingControl.spliceWaypoints(0, 1, ev.latlng);
+        }
+    }, {
+        text: 'Add Waypoint At End',
+        callback: function (ev) {
+            if (routingControl._plan._waypoints[routingControl._plan._waypoints.length - 1].latLng)
+                routingControl.spliceWaypoints(routingControl._plan._waypoints.length, 0, ev.latlng);
+            else
+                routingControl.spliceWaypoints(routingControl._plan._waypoints.length - 1, 1, ev.latlng);
+        }
+    }]
+});
+
 
 var attribution = '<a href="http://www.ptvgroup.com">PTV</a>, TOMTOM';
 var cluster = 'eu-n-test';
@@ -38,28 +43,33 @@ var cluster = 'eu-n-test';
 // http://bl.ocks.org/rsudekum/5431771
 map._panes.labelPane = map._createPane('leaflet-top-pane', map.getPanes().shadowPane);
 
+map.setView([0,0], 0);
 
-var getLayers = function(profile) {
+var replay = function () {
+    replaySpeed = $('#replaySpeed option:selected').val();
+    buildD3Animations(responses, replaySpeed);
+}
 
-//add tile layer
+var getLayers = function (profile) {
+    //add tile layer
     var bgLayer = new L.PtvLayer.FeatureLayerBg("https://xmap-eu-n-test.cloud.ptvgroup.com", {
         token: token,
         attribution: attribution,
         profile: profile + "-bg",
         beforeSend2: function (request) {
-            if(hour)
+            if (hour)
                 request.mapParams.referenceTime = moment.utc().add(hour, 'hours').format();
         }
     });
 
-//add fg layer
+    //add fg layer
     var fgLayer = new L.PtvLayer.FeatureLayerFg("https://xmap-eu-n-test.cloud.ptvgroup.com", {
         token: token,
         attribution: attribution,
         profile: profile + "-fg",
         pane: map._panes.labelPane,
         beforeSend2: function (request) {
-            if(hour)
+            if (hour)
                 request.mapParams.referenceTime = moment.utc().add(hour, 'hour').format()
         }
     });
@@ -96,9 +106,13 @@ $('#enableTrafficIncidents').attr("checked", enableTrafficIncidents);
 $('#enableTruckAttributes').attr("checked", enableTruckAttributes);
 $('#languageSelect').val(itineraryLanguage);
 $('#routingProfile').val(routingProfile);
+$('#alternativeRoutes').val(alternativeRoutes);
+$('#replaySpeed').val(replaySpeed);
 
 var sidebar = L.control.sidebar('sidebar').addTo(map);
 sidebar.open("home");
+ 
+fixClickPropagationForIE(sidebar._sidebar);
 
 var buildProfile = function () {
     var template = '<Profile xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><FeatureLayer majorVersion=\"1\" minorVersion=\"0\"><GlobalSettings enableTimeDependency=\"true\"/><Themes><Theme id=\"PTV_RestrictionZones\" enabled=\"{enableRestrictionZones}\" priorityLevel=\"0\"></Theme><Theme id=\"PTV_SpeedPatterns\" enabled=\"{enableSpeedPatterns}\" priorityLevel=\"0\"/><Theme id=\"PTV_TrafficIncidents\" enabled=\"{enableTrafficIncidents}\" priorityLevel=\"0\"/><Theme id=\"PTV_TruckAttributes\" enabled=\"{enableTruckAttributes}\" priorityLevel=\"0\"/><Theme id=\"PTV_TimeZones\" enabled=\"true\" priorityLevel=\"0\"/></Themes></FeatureLayer><Routing majorVersion=\"2\" minorVersion=\"0\"><Course><AdditionalDataRules enabled=\"true\"/></Course></Routing></Profile>'
@@ -124,14 +138,17 @@ var updateParams = function (refreshFeatureLayer) {
     enableTrafficIncidents = $('#enableTrafficIncidents').is(':checked');
     itineraryLanguage = $('#languageSelect option:selected').val();
     routingProfile = $('#routingProfile option:selected').val();
+    alternativeRoutes = $('#alternativeRoutes option:selected').val();
 
     if (refreshFeatureLayer) {
         speedPatterns.redraw();
-//        incidents.redraw();
+        //        incidents.redraw();
     }
 
+    routingControl._router.options.numberOfAlternatives = alternativeRoutes;
     routingControl.route();
 }
+
 
 var routingControl = L.Routing.control({
     plan: L.Routing.plan([
@@ -157,8 +174,11 @@ var routingControl = L.Routing.control({
         ]
     },
     router: L.Routing.ptv({
-        token: token, beforeSend: function (request) {
-            if(hour)
+        serviceUrl: 'https://xroute-' + cluster + '.cloud.ptvgroup.com/xroute/rs/XRoute/',
+        token: token,
+        numberOfAlternatives: alternativeRoutes,
+        beforeSend: function (request) {
+            if (hour)
                 request.options.push({
                     parameter: "START_TIME",
                     value: moment.utc().add(hour, 'hours').format()
@@ -177,6 +197,10 @@ var routingControl = L.Routing.control({
             request.callerContext.properties.push({ key: "Profile", value: routingProfile });
 
             return request;
+        },
+        routesCalculated: function (r) {
+            responses = r;
+            replay();
         }
     }),
     routeWhileDragging: false,
