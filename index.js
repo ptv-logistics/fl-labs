@@ -6,6 +6,7 @@ var enableSpeedPatterns = true;
 var enableRestrictionZones = true;
 var enableTrafficIncidents = true;
 var enableTruckAttributes = true;
+var dynamicTimeOnStaticRoute = false;
 var itineraryLanguage = 'EN';
 var routingProfile = 'truckfast';
 var alternativeRoutes = 0;
@@ -104,6 +105,7 @@ $('#enableSpeedPatterns').attr("checked", enableSpeedPatterns);
 $('#enableRestrictionZones').attr("checked", enableRestrictionZones);
 $('#enableTrafficIncidents').attr("checked", enableTrafficIncidents);
 $('#enableTruckAttributes').attr("checked", enableTruckAttributes);
+$('#dynamicTimeOnStaticRoute').attr("checked", dynamicTimeOnStaticRoute);
 $('#languageSelect').val(itineraryLanguage);
 $('#routingProfile').val(routingProfile);
 $('#alternativeRoutes').val(alternativeRoutes);
@@ -136,6 +138,7 @@ var updateParams = function (refreshFeatureLayer) {
     enableRestrictionZones = $('#enableRestrictionZones').is(':checked');
     enableTruckAttributes = $('#enableTruckAttributes').is(':checked');
     enableTrafficIncidents = $('#enableTrafficIncidents').is(':checked');
+    dynamicTimeOnStaticRoute = $('#dynamicTimeOnStaticRoute').is(':checked');
     itineraryLanguage = $('#languageSelect option:selected').val();
     routingProfile = $('#routingProfile option:selected').val();
     alternativeRoutes = $('#alternativeRoutes option:selected').val();
@@ -185,6 +188,12 @@ var routingControl = L.Routing.control({
                     value: moment.utc().add(hour, 'hours').format()
                 });
 
+			if(dynamicTimeOnStaticRoute)
+				request.options.push({
+					parameter: "DYNAMIC_TIME_ON_STATICROUTE",
+					value: true
+				});
+				
             request.options.push({
                 parameter: "ROUTE_LANGUAGE",
                 value: itineraryLanguage
