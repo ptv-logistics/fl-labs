@@ -1,16 +1,15 @@
 if (!token)
     alert("you need an xServer internet token to run this sample!");
 
-var hour = 0;
+var hour = moment('2015-05-29T12:00:00+00:00');
 var enableSpeedPatterns = true;
-var enableRestrictionZones = true;
-var enableTrafficIncidents = true;
-var enableTruckAttributes = true;
-var dynamicTimeOnStaticRoute = false;
+var enableRestrictionZones = false;
+var enableTrafficIncidents = false;
+var enableTruckAttributes = false;
+var dynamicTimeOnStaticRoute = true;
 var itineraryLanguage = 'EN';
-var routingProfile = 'truckfast';
-var alternativeRoutes = 0;
-var replaySpeed = 250;
+var routingProfile = 'carfast';
+var replaySpeed = 50;
 var responses = null;
 
 var map = L.map('map', {
@@ -58,8 +57,7 @@ var getLayers = function (profile) {
         attribution: attribution,
         profile: profile + "-bg",
         beforeSend2: function (request) {
-            if (hour)
-                request.mapParams.referenceTime = moment.utc().add(hour, 'hours').format();
+			request.mapParams.referenceTime = hour.format();
         }
     });
 
@@ -70,8 +68,7 @@ var getLayers = function (profile) {
         profile: profile + "-fg",
         pane: map._panes.labelPane,
         beforeSend2: function (request) {
-            if (hour)
-                request.mapParams.referenceTime = moment.utc().add(hour, 'hour').format()
+			request.mapParams.referenceTime = hour.format()
         }
     });
 
@@ -100,7 +97,7 @@ L.control.layers(baseLayers, {
 
 new L.Control.Zoom({ position: 'bottomleft' }).addTo(map);
 
-$('#range').attr("value", hour);
+$('#range').attr("value", hour.format());
 $('#enableSpeedPatterns').attr("checked", enableSpeedPatterns);
 $('#enableRestrictionZones').attr("checked", enableRestrictionZones);
 $('#enableTrafficIncidents').attr("checked", enableTrafficIncidents);
@@ -108,7 +105,6 @@ $('#enableTruckAttributes').attr("checked", enableTruckAttributes);
 $('#dynamicTimeOnStaticRoute').attr("checked", dynamicTimeOnStaticRoute);
 $('#languageSelect').val(itineraryLanguage);
 $('#routingProfile').val(routingProfile);
-$('#alternativeRoutes').val(alternativeRoutes);
 $('#replaySpeed').val(replaySpeed);
 
 var sidebar = L.control.sidebar('sidebar').addTo(map);
@@ -128,12 +124,12 @@ var buildProfile = function () {
 }
 
 var setNow = function () {
-    $('#range').val(0);
+    $('#range').val(moment().format());
     updateParams(true);
 }
 
 var updateParams = function (refreshFeatureLayer) {
-    hour = $('#range').val();
+    hour = moment($('#range').val());
     enableSpeedPatterns = $('#enableSpeedPatterns').is(':checked');
     enableRestrictionZones = $('#enableRestrictionZones').is(':checked');
     enableTruckAttributes = $('#enableTruckAttributes').is(':checked');
@@ -141,22 +137,21 @@ var updateParams = function (refreshFeatureLayer) {
     dynamicTimeOnStaticRoute = $('#dynamicTimeOnStaticRoute').is(':checked');
     itineraryLanguage = $('#languageSelect option:selected').val();
     routingProfile = $('#routingProfile option:selected').val();
-    alternativeRoutes = $('#alternativeRoutes option:selected').val();
 
     if (refreshFeatureLayer) {
         speedPatterns.redraw();
         //        incidents.redraw();
     }
 
-    routingControl._router.options.numberOfAlternatives = alternativeRoutes;
+    routingControl._router.options.numberOfAlternatives = dynamicTimeOnStaticRoute? 1 : 0,
     routingControl.route();
 }
 
 
 var routingControl = L.Routing.control({
     plan: L.Routing.plan([
-		L.latLng(48.813194201165274, 9.2841339111328125),
-		L.latLng(48.694133170886325, 9.122772216796875)
+		L.latLng(49.01502, 8.37922),
+		L.latLng(49.01328, 8.42806)
     ], {
         createMarker: function (i, wp) {
             return L.marker(wp.latLng, {
@@ -180,15 +175,15 @@ var routingControl = L.Routing.control({
     router: L.Routing.ptv({
         serviceUrl: 'https://xroute-' + cluster + '.cloud.ptvgroup.com/xroute/rs/XRoute/',
         token: token,
-        numberOfAlternatives: alternativeRoutes,
-        beforeSend: function (request) {
+        numberOfAlternatives: dynamicTimeOnStaticRoute? 1 : 0,
+        beforeSend: function (request, currentResponses) {		
             if (hour)
                 request.options.push({
                     parameter: "START_TIME",
-                    value: moment.utc().add(hour, 'hours').format()
+                    value: hour.format() // moment.utc().add(hour, 'hours').format()
                 });
 
-			if(dynamicTimeOnStaticRoute)
+			if(currentResponses.length > 0) // alt is static rout with dynamic time
 				request.options.push({
 					parameter: "DYNAMIC_TIME_ON_STATICROUTE",
 					value: true
