@@ -76,9 +76,9 @@ var getLayers = function (profile) {
 }
 
 var incidents = new L.PtvLayer.FeatureLayer({ name: 'PTV_TrafficIncidents' }).addTo(map);
-var truckAttributes = new L.PtvLayer.FeatureLayer({ name: 'PTV_TruckAttributes' }).addTo(map);
-var restrictionZones = new L.PtvLayer.FeatureLayer({ name: 'PTV_RestrictionZones' }).addTo(map);
 var speedPatterns = new L.PtvLayer.FeatureLayer({ name: 'PTV_SpeedPatterns' }).addTo(map);
+var restrictionZones = new L.PtvLayer.FeatureLayer({ name: 'PTV_RestrictionZones' }).addTo(map);
+var truckAttributes = new L.PtvLayer.FeatureLayer({ name: 'PTV_TruckAttributes' }); //.addTo(map);
 //var preferredRoutes = new L.PtvLayer.FeatureLayer({ name: 'PTV_PreferredRoutes' }).addTo(map);
 
 var baseLayers = {
@@ -128,8 +128,12 @@ var setNow = function () {
     updateParams(true);
 }
 
-var updateParams = function (refreshFeatureLayer) {
+var updateParams = function (refreshFeatureLayer, setTimeNow) {
+    if (setTimeNow)
+        $('#range').val(moment().format());
+
     hour = moment($('#range').val());
+
     enableSpeedPatterns = $('#enableSpeedPatterns').is(':checked');
     enableRestrictionZones = $('#enableRestrictionZones').is(':checked');
     enableTruckAttributes = $('#enableTruckAttributes').is(':checked');
@@ -138,7 +142,7 @@ var updateParams = function (refreshFeatureLayer) {
     itineraryLanguage = $('#languageSelect option:selected').val();
     routingProfile = $('#routingProfile option:selected').val();
 
-    if (refreshFeatureLayer) {
+    if (refreshFeatureLayer || setTimeNow) {
         speedPatterns.redraw();
         //        incidents.redraw();
     }
@@ -163,14 +167,11 @@ var routingControl = L.Routing.control({
 		reverseWaypoints: true
     }),
     lineOptions: {
-        styles: [
-          // Shadow
-          { color: 'black', opacity: 0.4, weight: 12 },
-          // Outline
-          { color: 'blue', opacity: 0.8, weight: 8 },
-          // Center
-          { color: 'lightblue', opacity: 1, weight: 4 }
-        ]
+			styles: [
+				{color: 'black', opacity: 0.15, weight: 9},
+				{color: 'white', opacity: 0.8, weight: 6},
+				{color: 'blue', opacity: 1, weight: 2}
+			]
     },
     router: L.Routing.ptv({
         serviceUrl: 'https://xroute-' + cluster + '.cloud.ptvgroup.com/xroute/rs/XRoute/',

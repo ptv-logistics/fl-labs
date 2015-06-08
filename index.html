@@ -43,6 +43,11 @@
             opacity: 0.75;
         }
 
+        .travelMarkerAlt {
+            fill: #a00;
+            opacity: 0.75;
+        }
+
         .waypoints {
             fill: black;
             opacity: 0;
@@ -80,10 +85,10 @@
                 <div>
                     <div style="margin: 10px 0px 10px 0px;">
                         <div>Consider layers for routing:</div>
-                        <div><input type="checkbox" id="enableTrafficIncidents" onchange="updateParams(false)">Traffic Incidents</div>
+                        <div><input type="checkbox" id="enableTrafficIncidents" onchange="updateParams(false, true)">Traffic Incidents</div>
+                        <div><input type="checkbox" id="enableSpeedPatterns" onchange="updateParams(false)">Speed Patterns</div>
                         <div><input type="checkbox" id="enableTruckAttributes" onchange="updateParams(false)">Truck Attributes</div>
                         <div><input type="checkbox" id="enableRestrictionZones" onchange="updateParams(false)">Restriction Zones</div>
-                        <div><input type="checkbox" id="enableSpeedPatterns" onchange="updateParams(false)">Speed Patterns</div>
                     </div>
                     <div style="margin: 10px 0px 10px 0px;">
                         <div>Select time of day</div>
