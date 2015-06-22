@@ -43,7 +43,7 @@ var cluster = 'eu-n-test';
 // http://bl.ocks.org/rsudekum/5431771
 map._panes.labelPane = map._createPane('leaflet-top-pane', map.getPanes().shadowPane);
 
-map.setView([0,0], 0);
+map.setView([0, 0], 0);
 
 var replay = function () {
     replaySpeed = $('#replaySpeed option:selected').val();
@@ -57,7 +57,7 @@ var getLayers = function (profile) {
         attribution: attribution,
         profile: profile + "-bg",
         beforeSend2: function (request) {
-			request.mapParams.referenceTime = hour.format();
+            request.mapParams.referenceTime = hour.format();
         }
     });
 
@@ -68,7 +68,11 @@ var getLayers = function (profile) {
         profile: profile + "-fg",
         pane: map._panes.labelPane,
         beforeSend2: function (request) {
-			request.mapParams.referenceTime = hour.format()
+            request.mapParams.referenceTime = hour.format()
+
+            if (map.hasLayer(incidents))
+                request.callerContext.properties.push({ "key": "ProfileXMLSnippet", "value": '<Profile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><FeatureLayer majorVersion="1" minorVersion="0"><GlobalSettings enableTimeDependency="true"/><Themes><Theme id="PTV_TrafficIncidents" enabled="true"><FeatureDescription includeTimeDomain="true" /></Theme></Themes></FeatureLayer></Profile>' });
+
         }
     });
 
@@ -109,7 +113,7 @@ $('#replaySpeed').val(replaySpeed);
 
 var sidebar = L.control.sidebar('sidebar').addTo(map);
 sidebar.open("home");
- 
+
 fixClickPropagationForIE(sidebar._sidebar);
 
 var buildProfile = function () {
@@ -147,7 +151,7 @@ var updateParams = function (refreshFeatureLayer, setTimeNow) {
         //        incidents.redraw();
     }
 
-    routingControl._router.options.numberOfAlternatives = dynamicTimeOnStaticRoute? 1 : 0,
+    routingControl._router.options.numberOfAlternatives = dynamicTimeOnStaticRoute ? 1 : 0,
     routingControl.route();
 }
 
@@ -164,32 +168,32 @@ var routingControl = L.Routing.control({
             });
         },
         geocoder: L.Control.Geocoder.ptv({ token: token }),
-		reverseWaypoints: true
+        reverseWaypoints: true
     }),
     lineOptions: {
-			styles: [
-				{color: 'black', opacity: 0.15, weight: 9},
-				{color: 'white', opacity: 0.8, weight: 6},
-				{color: 'blue', opacity: 1, weight: 2}
-			]
+        styles: [
+            { color: 'black', opacity: 0.15, weight: 9 },
+            { color: 'white', opacity: 0.8, weight: 6 },
+            { color: 'blue', opacity: 1, weight: 2 }
+        ]
     },
     router: L.Routing.ptv({
         serviceUrl: 'https://xroute-' + cluster + '.cloud.ptvgroup.com/xroute/rs/XRoute/',
         token: token,
-        numberOfAlternatives: dynamicTimeOnStaticRoute? 1 : 0,
-        beforeSend: function (request, currentResponses) {		
+        numberOfAlternatives: dynamicTimeOnStaticRoute ? 1 : 0,
+        beforeSend: function (request, currentResponses) {
             if (hour)
                 request.options.push({
                     parameter: "START_TIME",
                     value: hour.format() // moment.utc().add(hour, 'hours').format()
                 });
 
-			if(currentResponses.length > 0) // alt is static rout with dynamic time
-				request.options.push({
-					parameter: "DYNAMIC_TIME_ON_STATICROUTE",
-					value: true
-				});
-				
+            if (currentResponses.length > 0) // alt is static rout with dynamic time
+                request.options.push({
+                    parameter: "DYNAMIC_TIME_ON_STATICROUTE",
+                    value: true
+                });
+
             request.options.push({
                 parameter: "ROUTE_LANGUAGE",
                 value: itineraryLanguage
