@@ -12,6 +12,7 @@ var itineraryLanguage = 'EN';
 var routingProfile = 'carfast';
 var replaySpeed = 50;
 var responses = null;
+var doLoop = null;
 
 var map = L.map('map', {
     zoomControl: false,
@@ -48,7 +49,8 @@ map.setView([0, 0], 0);
 
 var replay = function () {
     replaySpeed = $('#replaySpeed option:selected').val();
-    buildD3Animations(responses, replaySpeed);
+    doLoop = $('#doLoop').is(':checked');
+    buildD3Animations(responses, replaySpeed, doLoop);
 }
 
 var getLayers = function (profile) {
@@ -112,6 +114,7 @@ $('#staticTimeOnStaticRoute').attr("checked", staticTimeOnStaticRoute);
 $('#languageSelect').val(itineraryLanguage);
 $('#routingProfile').val(routingProfile);
 $('#replaySpeed').val(replaySpeed);
+$('#doLoop').attr("checked", doLoop);
 
 var sidebar = L.control.sidebar('sidebar').addTo(map);
 sidebar.open("home");
