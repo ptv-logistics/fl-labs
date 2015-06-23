@@ -7,6 +7,7 @@ var enableRestrictionZones = false;
 var enableTrafficIncidents = false;
 var enableTruckAttributes = false;
 var dynamicTimeOnStaticRoute = true;
+var staticTimeOnStaticRoute = true;
 var itineraryLanguage = 'EN';
 var routingProfile = 'carfast';
 var replaySpeed = 50;
@@ -107,6 +108,7 @@ $('#enableRestrictionZones').attr("checked", enableRestrictionZones);
 $('#enableTrafficIncidents').attr("checked", enableTrafficIncidents);
 $('#enableTruckAttributes').attr("checked", enableTruckAttributes);
 $('#dynamicTimeOnStaticRoute').attr("checked", dynamicTimeOnStaticRoute);
+$('#staticTimeOnStaticRoute').attr("checked", staticTimeOnStaticRoute);
 $('#languageSelect').val(itineraryLanguage);
 $('#routingProfile').val(routingProfile);
 $('#replaySpeed').val(replaySpeed);
@@ -143,6 +145,7 @@ var updateParams = function (refreshFeatureLayer, setTimeNow) {
     enableTruckAttributes = $('#enableTruckAttributes').is(':checked');
     enableTrafficIncidents = $('#enableTrafficIncidents').is(':checked');
     dynamicTimeOnStaticRoute = $('#dynamicTimeOnStaticRoute').is(':checked');
+    staticTimeOnStaticRoute = $('#staticTimeOnStaticRoute').is(':checked');
     itineraryLanguage = $('#languageSelect option:selected').val();
     routingProfile = $('#routingProfile option:selected').val();
 
@@ -151,7 +154,7 @@ var updateParams = function (refreshFeatureLayer, setTimeNow) {
         //        incidents.redraw();
     }
 
-    routingControl._router.options.numberOfAlternatives = dynamicTimeOnStaticRoute ? 1 : 0,
+    routingControl._router.options.numberOfAlternatives = ((dynamicTimeOnStaticRoute)? 1:0) + ((staticTimeOnStaticRoute)? 1:0);
     routingControl.route();
 }
 
@@ -180,15 +183,15 @@ var routingControl = L.Routing.control({
     router: L.Routing.ptv({
         serviceUrl: 'https://xroute-' + cluster + '.cloud.ptvgroup.com/xroute/rs/XRoute/',
         token: token,
-        numberOfAlternatives: dynamicTimeOnStaticRoute ? 1 : 0,
-        beforeSend: function (request, currentResponses) {
+        numberOfAlternatives: ((dynamicTimeOnStaticRoute)? 1:0) + ((staticTimeOnStaticRoute)? 1:0),
+        beforeSend: function (request, currentResponses, idx) {
             if (hour)
                 request.options.push({
                     parameter: "START_TIME",
                     value: hour.format() // moment.utc().add(hour, 'hours').format()
                 });
 
-            if (currentResponses.length > 0) // alt is static rout with dynamic time
+            if (idx == 1 && dynamicTimeOnStaticRoute) // alt is static route with dynamic time
                 request.options.push({
                     parameter: "DYNAMIC_TIME_ON_STATICROUTE",
                     value: true
@@ -199,6 +202,7 @@ var routingControl = L.Routing.control({
                 value: itineraryLanguage
             });
 
+            if(idx == 0 || (idx == 1 && dynamicTimeOnStaticRoute)) 
             request.callerContext.properties.push({
                 key: "ProfileXMLSnippet",
                 value: buildProfile()
@@ -210,6 +214,11 @@ var routingControl = L.Routing.control({
         },
         routesCalculated: function (r) {
             responses = r;
+            if (!dynamicTimeOnStaticRoute)
+            {
+                responses[2] = responses[1];
+                responses[1] = null;
+            }
             replay();
         }
     }),

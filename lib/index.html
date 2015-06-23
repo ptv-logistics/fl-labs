@@ -38,19 +38,14 @@
             pointer-events: none;
         }
 
-        .travelMarker0 {
+        .travelMarker {
             fill: yellow;
             opacity: 0.75;
         }
 
-        .travelMarker1 {
+        .travelMarkerAlt {
             fill: #a00;
             opacity: 0.75;
-        }
-
-        .travelMarker2 {
-            fill: black;
-            opacity: 0.5;
         }
 
         .waypoints {
@@ -139,8 +134,7 @@
                             <option>PT</option>
                         </select>
                     </div>
-                    <div><input type="checkbox" id="dynamicTimeOnStaticRoute" onchange="updateParams(false)">Show static Route with dyn. Time</div>
-                    <div><input type="checkbox" id="staticTimeOnStaticRoute" onchange="updateParams(false)">Show static Route with static Time</div>
+                    <div><input type="checkbox" id="dynamicTimeOnStaticRoute" onchange="updateParams(false)">Static Route as Alternative</div>
                     <div style="margin: 10px 0px 10px 0px;">
                         Replay Speed
                         <select id="replaySpeed" onchange="replay()">
