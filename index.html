@@ -43,6 +43,11 @@
             opacity: 0.75;
         }
 
+        .travelMarkerAlt {
+            fill: #a00;
+            opacity: 0.75;
+        }
+
         .waypoints {
             fill: black;
             opacity: 0;
@@ -80,14 +85,14 @@
                 <div>
                     <div style="margin: 10px 0px 10px 0px;">
                         <div>Consider layers for routing:</div>
-                        <div><input type="checkbox" id="enableTrafficIncidents" onchange="updateParams(false)">Traffic Incidents</div>
+                        <div><input type="checkbox" id="enableTrafficIncidents" onchange="updateParams(false, true)">Traffic Incidents</div>
+                        <div><input type="checkbox" id="enableSpeedPatterns" onchange="updateParams(false)">Speed Patterns</div>
                         <div><input type="checkbox" id="enableTruckAttributes" onchange="updateParams(false)">Truck Attributes</div>
                         <div><input type="checkbox" id="enableRestrictionZones" onchange="updateParams(false)">Restriction Zones</div>
-                        <div><input type="checkbox" id="enableSpeedPatterns" onchange="updateParams(false)">Speed Patterns</div>
                     </div>
                     <div style="margin: 10px 0px 10px 0px;">
                         <div>Select time of day</div>
-                        -12h <input id="range" type="range" min="-12" max="12" step="2" onchange="updateParams(true)" /> +12h
+                        <input id="range" type="text" onchange="updateParams(true)" />
                         <button onclick="setNow()">Now</button>
                     </div>
                     <div style="margin: 10px 0px 10px 0px;">
@@ -102,14 +107,6 @@
                             <option>bicycle</option>
                             <option>bicycle-oneway</option>
                             <option>pedestrian</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="alternativeRoutes">Alternative Routes</label>
-                        <select id="alternativeRoutes" onchange="updateParams()">
-                            <option>0</option>
-                            <option>1</option>
-                            <option>2</option>
                         </select>
                     </div>
                     <div style="margin: 10px 0px 10px 0px;">
@@ -137,6 +134,7 @@
                             <option>PT</option>
                         </select>
                     </div>
+                    <div><input type="checkbox" id="dynamicTimeOnStaticRoute" onchange="updateParams(false)">Static Route as Alternative</div>
                     <div style="margin: 10px 0px 10px 0px;">
                         Replay Speed
                         <select id="replaySpeed" onchange="replay()">

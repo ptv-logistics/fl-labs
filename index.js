@@ -1,15 +1,15 @@
 if (!token)
     alert("you need an xServer internet token to run this sample!");
 
-var hour = 0;
+var hour = moment('2015-05-29T12:00:00+00:00');
 var enableSpeedPatterns = true;
-var enableRestrictionZones = true;
-var enableTrafficIncidents = true;
-var enableTruckAttributes = true;
+var enableRestrictionZones = false;
+var enableTrafficIncidents = false;
+var enableTruckAttributes = false;
+var dynamicTimeOnStaticRoute = true;
 var itineraryLanguage = 'EN';
-var routingProfile = 'truckfast';
-var alternativeRoutes = 0;
-var replaySpeed = 250;
+var routingProfile = 'carfast';
+var replaySpeed = 50;
 var responses = null;
 
 var map = L.map('map', {
@@ -43,7 +43,7 @@ var cluster = 'eu-n-test';
 // http://bl.ocks.org/rsudekum/5431771
 map._panes.labelPane = map._createPane('leaflet-top-pane', map.getPanes().shadowPane);
 
-map.setView([0,0], 0);
+map.setView([0, 0], 0);
 
 var replay = function () {
     replaySpeed = $('#replaySpeed option:selected').val();
@@ -57,8 +57,7 @@ var getLayers = function (profile) {
         attribution: attribution,
         profile: profile + "-bg",
         beforeSend2: function (request) {
-            if (hour)
-                request.mapParams.referenceTime = moment.utc().add(hour, 'hours').format();
+            request.mapParams.referenceTime = hour.format();
         }
     });
 
@@ -69,8 +68,11 @@ var getLayers = function (profile) {
         profile: profile + "-fg",
         pane: map._panes.labelPane,
         beforeSend2: function (request) {
-            if (hour)
-                request.mapParams.referenceTime = moment.utc().add(hour, 'hour').format()
+            request.mapParams.referenceTime = hour.format()
+
+            if (map.hasLayer(incidents))
+                request.callerContext.properties.push({ "key": "ProfileXMLSnippet", "value": '<Profile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><FeatureLayer majorVersion="1" minorVersion="0"><GlobalSettings enableTimeDependency="true"/><Themes><Theme id="PTV_TrafficIncidents" enabled="true"><FeatureDescription includeTimeDomain="true" /></Theme></Themes></FeatureLayer></Profile>' });
+
         }
     });
 
@@ -78,9 +80,9 @@ var getLayers = function (profile) {
 }
 
 var incidents = new L.PtvLayer.FeatureLayer({ name: 'PTV_TrafficIncidents' }).addTo(map);
-var truckAttributes = new L.PtvLayer.FeatureLayer({ name: 'PTV_TruckAttributes' }).addTo(map);
-var restrictionZones = new L.PtvLayer.FeatureLayer({ name: 'PTV_RestrictionZones' }).addTo(map);
 var speedPatterns = new L.PtvLayer.FeatureLayer({ name: 'PTV_SpeedPatterns' }).addTo(map);
+var restrictionZones = new L.PtvLayer.FeatureLayer({ name: 'PTV_RestrictionZones' }).addTo(map);
+var truckAttributes = new L.PtvLayer.FeatureLayer({ name: 'PTV_TruckAttributes' }); //.addTo(map);
 //var preferredRoutes = new L.PtvLayer.FeatureLayer({ name: 'PTV_PreferredRoutes' }).addTo(map);
 
 var baseLayers = {
@@ -99,19 +101,19 @@ L.control.layers(baseLayers, {
 
 new L.Control.Zoom({ position: 'bottomleft' }).addTo(map);
 
-$('#range').attr("value", hour);
+$('#range').attr("value", hour.format());
 $('#enableSpeedPatterns').attr("checked", enableSpeedPatterns);
 $('#enableRestrictionZones').attr("checked", enableRestrictionZones);
 $('#enableTrafficIncidents').attr("checked", enableTrafficIncidents);
 $('#enableTruckAttributes').attr("checked", enableTruckAttributes);
+$('#dynamicTimeOnStaticRoute').attr("checked", dynamicTimeOnStaticRoute);
 $('#languageSelect').val(itineraryLanguage);
 $('#routingProfile').val(routingProfile);
-$('#alternativeRoutes').val(alternativeRoutes);
 $('#replaySpeed').val(replaySpeed);
 
 var sidebar = L.control.sidebar('sidebar').addTo(map);
 sidebar.open("home");
- 
+
 fixClickPropagationForIE(sidebar._sidebar);
 
 var buildProfile = function () {
@@ -126,34 +128,38 @@ var buildProfile = function () {
 }
 
 var setNow = function () {
-    $('#range').val(0);
+    $('#range').val(moment().format());
     updateParams(true);
 }
 
-var updateParams = function (refreshFeatureLayer) {
-    hour = $('#range').val();
+var updateParams = function (refreshFeatureLayer, setTimeNow) {
+    if (setTimeNow)
+        $('#range').val(moment().format());
+
+    hour = moment($('#range').val());
+
     enableSpeedPatterns = $('#enableSpeedPatterns').is(':checked');
     enableRestrictionZones = $('#enableRestrictionZones').is(':checked');
     enableTruckAttributes = $('#enableTruckAttributes').is(':checked');
     enableTrafficIncidents = $('#enableTrafficIncidents').is(':checked');
+    dynamicTimeOnStaticRoute = $('#dynamicTimeOnStaticRoute').is(':checked');
     itineraryLanguage = $('#languageSelect option:selected').val();
     routingProfile = $('#routingProfile option:selected').val();
-    alternativeRoutes = $('#alternativeRoutes option:selected').val();
 
-    if (refreshFeatureLayer) {
+    if (refreshFeatureLayer || setTimeNow) {
         speedPatterns.redraw();
         //        incidents.redraw();
     }
 
-    routingControl._router.options.numberOfAlternatives = alternativeRoutes;
+    routingControl._router.options.numberOfAlternatives = dynamicTimeOnStaticRoute ? 1 : 0,
     routingControl.route();
 }
 
 
 var routingControl = L.Routing.control({
     plan: L.Routing.plan([
-		L.latLng(48.813194201165274, 9.2841339111328125),
-		L.latLng(48.694133170886325, 9.122772216796875)
+		L.latLng(49.01502, 8.37922),
+		L.latLng(49.01328, 8.42806)
     ], {
         createMarker: function (i, wp) {
             return L.marker(wp.latLng, {
@@ -161,27 +167,31 @@ var routingControl = L.Routing.control({
                 icon: new L.Icon.Label.Default({ labelText: String.fromCharCode(65 + i) })
             });
         },
-        geocoder: L.Control.Geocoder.ptv({ token: token })
+        geocoder: L.Control.Geocoder.ptv({ token: token }),
+        reverseWaypoints: true
     }),
     lineOptions: {
         styles: [
-          // Shadow
-          { color: 'black', opacity: 0.4, weight: 12 },
-          // Outline
-          { color: 'blue', opacity: 0.8, weight: 8 },
-          // Center
-          { color: 'lightblue', opacity: 1, weight: 4 }
+            { color: 'black', opacity: 0.15, weight: 9 },
+            { color: 'white', opacity: 0.8, weight: 6 },
+            { color: 'blue', opacity: 1, weight: 2 }
         ]
     },
     router: L.Routing.ptv({
         serviceUrl: 'https://xroute-' + cluster + '.cloud.ptvgroup.com/xroute/rs/XRoute/',
         token: token,
-        numberOfAlternatives: alternativeRoutes,
-        beforeSend: function (request) {
+        numberOfAlternatives: dynamicTimeOnStaticRoute ? 1 : 0,
+        beforeSend: function (request, currentResponses) {
             if (hour)
                 request.options.push({
                     parameter: "START_TIME",
-                    value: moment.utc().add(hour, 'hours').format()
+                    value: hour.format() // moment.utc().add(hour, 'hours').format()
+                });
+
+            if (currentResponses.length > 0) // alt is static rout with dynamic time
+                request.options.push({
+                    parameter: "DYNAMIC_TIME_ON_STATICROUTE",
+                    value: true
                 });
 
             request.options.push({
