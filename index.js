@@ -215,12 +215,19 @@ var routingControl = L.Routing.control({
 
             return request;
         },
-        routesCalculated: function (r) {
+        routesCalculated: function (alts, r) {
             responses = r;
+            alts[0].name = '<i style="background:yellow"></i>Dynamic Route';
             if (!dynamicTimeOnStaticRoute)
             {
+                alts[1].name = '<i style="background:black"></i>Static Route';
                 responses[2] = responses[1];
                 responses[1] = null;
+            }
+            else {
+                alts[1].name = '<i style="background:#a00"></i>Static Route /w dynamic Time';
+                if (staticTimeOnStaticRoute)
+                    alts[2].name = '<i style="background:black"></i>Static Route';
             }
             replay();
         }
