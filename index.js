@@ -220,7 +220,9 @@ var routingControl = L.Routing.control({
             alts[0].name = '<i style="background:yellow"></i>Dynamic Route';
             if (!dynamicTimeOnStaticRoute)
             {
-                alts[1].name = '<i style="background:black"></i>Static Route';
+                if (staticTimeOnStaticRoute)
+                    alts[1].name = '<i style="background:black"></i>Static Route';
+
                 responses[2] = responses[1];
                 responses[1] = null;
             }
