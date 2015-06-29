@@ -234,6 +234,7 @@ var routingControl = L.Routing.control({
             replay();
         }
     }),
+    formatter: new L.Routing.Formatter({roundingSensitivity: 1000}),
     routeWhileDragging: false,
     routeDragInterval: 1000
 }).addTo(map);
