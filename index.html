@@ -22,7 +22,7 @@
             font: 10pt "Helvetica Neue", Arial, Helvetica, sans-serif;
         }
 
-        h1, p {
+        /*h1, p {
             margin-top: 3em;
         }
 
@@ -32,7 +32,7 @@
 
         h3 {
             margin-top: 1em;
-        }
+        }*/
 
         .leaflet-top-pane {
             pointer-events: none;
@@ -62,6 +62,14 @@
             fill: none;
             stroke: black;
             opacity: 1;
+        }
+
+        .leaflet-routing-alt i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
         }
     </style>
 </head>
@@ -139,8 +147,8 @@
                             <option>PT</option>
                         </select>
                     </div>
-                    <div><input type="checkbox" id="dynamicTimeOnStaticRoute" onchange="updateParams(false)">Show static Route with dyn. Time</div>
-                    <div><input type="checkbox" id="staticTimeOnStaticRoute" onchange="updateParams(false)">Show static Route with static Time</div>
+                    <div><input type="checkbox" id="dynamicTimeOnStaticRoute" onchange="updateParams(false)">Show static Route /w dynamic Time</div>
+                    <div><input type="checkbox" id="staticTimeOnStaticRoute" onchange="updateParams(false)">Show static Route</div>
                     <div style="margin: 10px 0px 10px 0px;">
                         Replay Speed
                         <select id="replaySpeed" onchange="replay()">
