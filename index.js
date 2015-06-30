@@ -73,7 +73,7 @@ var getLayers = function (profile) {
         beforeSend2: function (request) {
             request.mapParams.referenceTime = hour.format()
 
-            if (map.hasLayer(incidents))
+            if (incidents.visible)
                 request.callerContext.properties.push({ "key": "ProfileXMLSnippet", "value": '<Profile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><FeatureLayer majorVersion="1" minorVersion="0"><GlobalSettings enableTimeDependency="true"/><Themes><Theme id="PTV_TrafficIncidents" enabled="true"><FeatureDescription includeTimeDomain="true" /></Theme></Themes></FeatureLayer></Profile>' });
 
         }

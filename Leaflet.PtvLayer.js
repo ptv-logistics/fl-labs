@@ -609,7 +609,8 @@ L.PtvLayer.FeatureLayer = L.Class.extend({
 
     onRemove: function (map) {
         this.visible = false;
-        this.redraw();
+        var that = this;
+        setTimeout(function () {that.redraw();}, 0);
     },
 
     redraw: function () {
