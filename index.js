@@ -1,7 +1,7 @@
 if (!token)
     alert("you need an xServer internet token to run this sample!");
 
-var hour = moment('2015-05-29T12:00:00+00:00');
+var hour = moment('2015-08-17T18:30:00+02:00');
 var enableSpeedPatterns = true;
 var enableRestrictionZones = false;
 var enableTrafficIncidents = false;
@@ -176,13 +176,14 @@ var routingControl = L.Routing.control({
         geocoder: L.Control.Geocoder.ptv({ token: token }),
         reverseWaypoints: true
     }),
-    lineOptions: {
+    altLineOptions: {
         styles: [
-            { color: 'black', opacity: 0.15, weight: 9 },
-            { color: 'white', opacity: 0.8, weight: 6 },
-            { color: 'blue', opacity: 1, weight: 2 }
-        ]
-    },
+            {color: 'black', opacity: 0.15, weight: 9},
+            {color: 'white', opacity: 0.8, weight: 6},
+            {color: 'blue', opacity: 0.5, weight: 2}
+        ],
+	},
+    showAlternatives: true,		
     router: L.Routing.ptv({
         serviceUrl: 'https://xroute-' + cluster + '.cloud.ptvgroup.com/xroute/rs/XRoute/',
         token: token,
