@@ -148,6 +148,10 @@ var updateScenario = function() {
 		routingControl.setWaypoints([
 			L.latLng(40.78263, -74.03331),
 			L.latLng(40.71307, -74.00724)]);
+	else if(scenario === 'Paris')
+		routingControl.setWaypoints([
+			L.latLng(y=48.92233, 2.32382),
+			L.latLng(y=48.80220, 2.44454)]);
 	else if(scenario === 'Karlsruhe')
 		routingControl.setWaypoints([
 			L.latLng(49.01502, 8.37922),
