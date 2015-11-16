@@ -96,6 +96,13 @@
                     an address at the address input field.
                 </h3>
                 <div>
+                    <p>
+                        <label for="scenarioSelect">Sample Route</label>
+                        <select id="scenarioSelect" onchange="updateScenario()">
+                            <option>New York</option>
+                            <option>Karlsruhe</option>
+                        </select>
+                    </p>
                     <div style="margin: 10px 0px 10px 0px;">
                         <div>Consider layers for routing:</div>
                         <div><input type="checkbox" id="enableTrafficIncidents" onchange="updateParams(false, true)">Traffic Incidents</div>

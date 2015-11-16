@@ -10,9 +10,10 @@ var dynamicTimeOnStaticRoute = true;
 var staticTimeOnStaticRoute = true;
 var itineraryLanguage = 'EN';
 var routingProfile = 'carfast';
-var replaySpeed = 50;
+var replaySpeed = 100;
 var responses = null;
 var doLoop = null;
+var scenario = 'New York';
 
 var map = L.map('map', {
     zoomControl: false,
@@ -39,7 +40,6 @@ var map = L.map('map', {
 
 
 var attribution = '<a href="http://www.ptvgroup.com">PTV</a>, TOMTOM';
-var cluster = 'eu-n-test';
 
 // create a separate pane for the xmap labels, so they are displayed on top of the route line
 // http://bl.ocks.org/rsudekum/5431771
@@ -55,17 +55,18 @@ var replay = function () {
 
 var getLayers = function (profile) {
     //add tile layer
-    var bgLayer = new L.PtvLayer.FeatureLayerBg("https://xmap-eu-n-test.cloud.ptvgroup.com", {
+    var bgLayer = new L.PtvLayer.FeatureLayerBg("https://api-eu-test.cloud.ptvgroup.com", {
         token: token,
         attribution: attribution,
         profile: profile + "-bg",
         beforeSend2: function (request) {
             request.mapParams.referenceTime = hour.format();
+            request.callerContext.properties.push({ "key": "ProfileXMLSnippet", "value": '<Profile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><FeatureLayer majorVersion="1" minorVersion="0"><GlobalSettings enableTimeDependency="true"/></FeatureLayer></Profile>' });
         }
     });
 
     //add fg layer
-    var fgLayer = new L.PtvLayer.FeatureLayerFg("https://xmap-eu-n-test.cloud.ptvgroup.com", {
+    var fgLayer = new L.PtvLayer.FeatureLayerFg("https://api-eu-test.cloud.ptvgroup.com", {
         token: token,
         attribution: attribution,
         profile: profile + "-fg",
@@ -73,6 +74,7 @@ var getLayers = function (profile) {
         beforeSend2: function (request) {
             request.mapParams.referenceTime = hour.format()
 
+			// include time domain for incidents
             if (incidents.visible)
                 request.callerContext.properties.push({ "key": "ProfileXMLSnippet", "value": '<Profile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><FeatureLayer majorVersion="1" minorVersion="0"><GlobalSettings enableTimeDependency="true"/><Themes><Theme id="PTV_TrafficIncidents" enabled="true"><FeatureDescription includeTimeDomain="true" /></Theme></Themes></FeatureLayer></Profile>' });
 
@@ -104,6 +106,7 @@ L.control.layers(baseLayers, {
 
 new L.Control.Zoom({ position: 'bottomleft' }).addTo(map);
 
+// update ui
 $('#range').attr("value", hour.format());
 $('#enableSpeedPatterns').attr("checked", enableSpeedPatterns);
 $('#enableRestrictionZones').attr("checked", enableRestrictionZones);
@@ -115,6 +118,7 @@ $('#languageSelect').val(itineraryLanguage);
 $('#routingProfile').val(routingProfile);
 $('#replaySpeed').val(replaySpeed);
 $('#doLoop').attr("checked", doLoop);
+$('#scenarioSelect').val(scenario);
 
 var sidebar = L.control.sidebar('sidebar').addTo(map);
 sidebar.open("home");
@@ -135,6 +139,21 @@ var buildProfile = function () {
 var setNow = function () {
     $('#range').val(moment().format());
     updateParams(true);
+}
+
+var updateScenario = function() {
+	scenario = $('#scenarioSelect option:selected').val();
+
+	if(scenario === 'New York')
+		routingControl.setWaypoints([
+			L.latLng(40.78263, -74.03331),
+			L.latLng(40.71307, -74.00724)]);
+	else if(scenario === 'Karlsruhe')
+		routingControl.setWaypoints([
+			L.latLng(49.01502, 8.37922),
+			L.latLng(49.01328, 8.42806)]);
+		
+    routingControl.route();
 }
 
 var updateParams = function (refreshFeatureLayer, setTimeNow) {
@@ -161,19 +180,17 @@ var updateParams = function (refreshFeatureLayer, setTimeNow) {
     routingControl.route();
 }
 
-
 var routingControl = L.Routing.control({
-    plan: L.Routing.plan([
-		L.latLng(49.01502, 8.37922),
-		L.latLng(49.01328, 8.42806)
-    ], {
+     plan: L.Routing.plan([], {
         createMarker: function (i, wp) {
             return L.marker(wp.latLng, {
                 draggable: true,
                 icon: new L.Icon.Label.Default({ labelText: String.fromCharCode(65 + i) })
             });
         },
-        geocoder: L.Control.Geocoder.ptv({ token: token }),
+        geocoder: L.Control.Geocoder.ptv({
+        serviceUrl: 'https://api-eu-test.cloud.ptvgroup.com/xlocate/rs/XLocate/',
+		token: token }),
         reverseWaypoints: true
     }),
     altLineOptions: {
@@ -185,7 +202,7 @@ var routingControl = L.Routing.control({
 	},
     showAlternatives: true,		
     router: L.Routing.ptv({
-        serviceUrl: 'https://xroute-' + cluster + '.cloud.ptvgroup.com/xroute/rs/XRoute/',
+        serviceUrl: 'https://api-eu-test.cloud.ptvgroup.com/xroute/rs/XRoute/',
         token: token,
         numberOfAlternatives: ((dynamicTimeOnStaticRoute)? 1:0) + ((staticTimeOnStaticRoute)? 1:0),
         beforeSend: function (request, currentResponses, idx) {
@@ -205,7 +222,7 @@ var routingControl = L.Routing.control({
                 parameter: "ROUTE_LANGUAGE",
                 value: itineraryLanguage
             });
-
+	
             if(idx == 0 || (idx == 1 && dynamicTimeOnStaticRoute)) 
             request.callerContext.properties.push({
                 key: "ProfileXMLSnippet",
@@ -243,3 +260,5 @@ var routingControl = L.Routing.control({
 routingControl.on('routingerror', function (e) {
     alert(e.error.responseJSON.errorMessage);
 });
+
+updateScenario();
