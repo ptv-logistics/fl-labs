@@ -72,7 +72,7 @@ var getLayers = function (profile) {
         profile: profile + "-fg",
         pane: map._panes.labelPane,
         beforeSend2: function (request) {
-            request.mapParams.referenceTime = hour.format()
+            request.mapParams.referenceTime = hour.format();
 
 			// include time domain for incidents
             if (incidents.visible)
