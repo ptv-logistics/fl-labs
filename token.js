@@ -1,1 +1,1 @@
-var token = ''; // insert your token here
+var token = '870241687284044'; // insert your token here
