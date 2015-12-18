@@ -140,17 +140,22 @@ L.Routing.Ptv = L.Class.extend({
     _bulidInstructions: function(manoeuvres, segments, stations) {
         var instructions = [];
 
+        if (!manoeuvres) {
+            return instructions;
+        }
+
         for (var i = 0; i < manoeuvres.length; i++) {
             var manoeuvre = manoeuvres[i];
             instructions.push({
-                distance: segments[manoeuvre.succSegmentIdx].accDist,
+                distance: segments[manoeuvre.routeListSegmentIdx].accDist,
                 exit: undefined,
-                index: segments[manoeuvre.succSegmentIdx].firstPolyIdx,
-                time: segments[manoeuvre.succSegmentIdx].accTime,
+                index: segments[manoeuvre.routeListSegmentIdx].firstPolyIdx,
+                time: segments[manoeuvre.routeListSegmentIdx].accTime,
                 type: this._drivingDirectionType(manoeuvre),
                 text: manoeuvre.manoeuvreDesc
             });
         }
+
         for (var i = stations.length - 1; i >= 0; i--) {
             var station = stations[i];
             instructions.splice(station.manoeuvreIdx, 0, {
