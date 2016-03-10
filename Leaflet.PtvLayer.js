@@ -26,7 +26,7 @@ L.PtvLayer = L.NonTiledLayer.extend({
 
     onAdd: function (map) {
         this._poiMarkers = L.featureGroup().addTo(map);
-        this._poiArray = {};
+        this._poiArray = [];
 
         L.NonTiledLayer.prototype.onAdd.call(this, map);
     },
@@ -52,6 +52,10 @@ L.PtvLayer = L.NonTiledLayer.extend({
                     "/9j/4": "data:image/jpeg;base64,",
                     "Qk02U": "data:image/bmp;base64,"
                 };
+				resp.world1 = world1;
+				resp.world2 = world2;
+				resp.width = width;
+				resp.height = height;
                 var rawImage = resp.image.rawImage;
                 callback(key, prefixMap[rawImage.substr(0, 5)] + rawImage, resp);
             }, function (xhr) { callback(L.Util.emptyImageUrl); });
@@ -501,8 +505,10 @@ L.PtvLayer.FeatureLayerFg = L.PtvLayer.NonTiled.extend({
         // http://stackoverflow.com/questions/17028830/imageoverlay-and-rectangle-z-index-issue                                                                                        
         var svgObj = $('.leaflet-overlay-pane svg');
         svgObj.css('z-index', 9999);
-
-        var newElements = {};
+		
+        for (var i = 0; i < this._poiArray.length; i++) {
+            this._poiMarkers.removeLayer(this._poiArray[i]);
+        }
 
         for (var l = 0; l < resp.objects.length; l++) {
             var objects = resp.objects[l].objects;
@@ -518,31 +524,41 @@ L.PtvLayer.FeatureLayerFg = L.PtvLayer.NonTiled.extend({
                 var id = resp.objects[l].name + this._getId(objects[i]);
 
                 var tooltip = this._formatTooltip(objects[i].descr);
-                var latlng = [objects[i].ref.point.y, objects[i].ref.point.x];
+				var latlng = this.pixToLatLng(resp.world1, resp.world2, resp.width, resp.height, objects[i].pixel);
 
-                if (this._poiArray[id]) {
-                    delete this._poiArray[id];
-                } else {
+                var marker = L.marker(latlng, {
+                    icon: myIcon,
+                    zIndexOffset: i - 1000 // will correct overlapping objects
+                }).bindPopup(tooltip).addTo(this._poiMarkers);
 
-                    var marker = L.marker(latlng, {
-                        icon: myIcon,
-                        zIndexOffset: i - 1000 // will correct overlapping objects
-                    }).bindPopup(tooltip).addTo(this._poiMarkers);
-
-                    newElements[id] = marker;
-                }
+                 this._poiArray.push(marker);
             }
         }
-
-        var k = Object.keys(this._poiArray);
-
-        for (var i = 0; i < k.length; i++) {
-            this._poiMarkers.removeLayer(this._poiArray[k[i]]);
-        }
-
-        this._poiArray = newElements;
-
     },
+	
+	pixToLatLng: function (world1, world2, width, height, point) {
+		var m1 = this.latLngToMercator(world1);
+		var m2 = this.latLngToMercator(world2);
+		var o = L.point(m2.x - m1.x, m2.y - m1.y);
+		var rx = point.x / width;
+		var ry = point.y / height;
+		var mr = L.point(m1.x + rx * o.x, m1.y + ry * o.y)
+
+		return this.mercatorToLatLng(mr);
+    },
+	
+	mercatorToLatLng: function(p)
+	{
+	    return L.latLng(
+            (360 / Math.PI) * (Math.atan(Math.exp(p.y)) - (Math.PI / 4)),
+            (180.0 / Math.PI) * p.x);
+	},
+	
+	latLngToMercator: function(p) {
+		return L.point (
+			p.lng * Math.PI / 180.0,
+			Math.log(Math.tan(Math.PI / 4.0 + p.lat * Math.PI / 360.0)));
+	},
 
     _getId: function (objectInfo) {
         return objectInfo.descr + objectInfo.ref.point.x + +objectInfo.ref.point.y;
