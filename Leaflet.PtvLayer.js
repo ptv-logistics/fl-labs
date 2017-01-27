@@ -33,7 +33,7 @@ L.PtvLayer = L.NonTiledLayer.extend({
 
     onRemove: function (map) {
         map.removeLayer(this._poiMarkers);
-        this._poiArray = {};
+        this._poiArray = [];
         L.NonTiledLayer.prototype.onRemove.call(this, map);
     },
 

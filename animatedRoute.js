@@ -130,16 +130,6 @@ var buildD3Animation = function (route, index, layer, svg, replaySpeed) {
     // group element. We're adding a class with the line name
     // and we're making them invisible
 
-    // these are the points that make up the path
-    // they are unnecessary so I've make them
-    // transparent for now
-    var ptFeatures = g.selectAll("circle")
-        .data(featuresdata)
-        .enter()
-        .append("circle")
-        .attr("r", 3)
-        .attr("class", "waypoints");
-
     // Here we will make the points into a single
     // line/path. Note that we surround the featuresdata
     // with [] to tell d3 to treat all the points as a
@@ -179,21 +169,6 @@ var buildD3Animation = function (route, index, layer, svg, replaySpeed) {
         var bounds = d3path.bounds(collection),
             topLeft = bounds[0],
             bottomRight = bounds[1];
-
-
-        // here you're setting some styles, width, heigh etc
-        // to the SVG. Note that we're adding a little height and
-        // width because otherwise the bounding box would perfectly
-        // cover our features BUT... since you might be using a big
-        // circle to represent a 1 dimensional point, the circle
-        // might get cut off.
-
-        ptFeatures.attr("transform",
-            function (d) {
-                return "translate(" +
-                    applyLatLngToLayer(d).x + "," +
-                    applyLatLngToLayer(d).y + ")";
-            });
 
         // again, not best practice, but I'm harding coding
         // the starting point
@@ -263,6 +238,21 @@ var buildD3Animation = function (route, index, layer, svg, replaySpeed) {
         return -1;
     }
 
+    function getRelTimeOnSegment(route, rTime) {
+        // find the (first) index where the accumlated segment time is greater
+        var i = binaryIndexOf(route.segments, rTime);
+
+        // get the relative distance 
+        var xt = (i == 0) ? 0 : route.segments[i - 1].accTime;
+        var xd = (i == 0) ? 0 : route.segments[i - 1].accDist;
+        var dt = rTime - xt;
+        var at = route.segments[i].accTime - xt;
+        var rt = dt / at;
+        var ad = route.segments[i].accDist - xd;
+        var rd = ad * rt;
+        return (xd + rd) / sumDist;
+    }
+
     // this function feeds the attrTween operator above with the
     // stroke and dash lengths
     function tweenDash() {
@@ -273,18 +263,7 @@ var buildD3Animation = function (route, index, layer, svg, replaySpeed) {
             // the relatibe time
             var rTime = t * sumTime;
 
-            // find the (first) index where the accumlated segment time is greater
-            var i = binaryIndexOf(route.segments, rTime);
-
-            // get the relative distance 
-            var xt = (i == 0) ? 0 : route.segments[i - 1].accTime;
-            var xd = (i == 0) ? 0 : route.segments[i - 1].accDist;
-            var dt = rTime - xt;
-            var at = route.segments[i].accTime - xt;
-            var rt = dt / at;
-            var ad = route.segments[i].accDist - xd;
-            var rd = ad * rt;
-            t = (xd + rd) / sumDist;
+            var t = getRelTimeOnSegment(route, rTime);
 
             // this is creating a function called interpolate which takes
             // as input a single value 0-1. The function will interpolate
