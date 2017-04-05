@@ -13,7 +13,7 @@ L.Routing.Ptv = L.Class.extend({
             locations: {}
         };
     },
-    
+
     currentRouteIdx: 0,
 
     hasError: false,
@@ -32,36 +32,36 @@ L.Routing.Ptv = L.Class.extend({
         this.currentRouteIdx++;
         hasError = false;
 
-        for (var i = 0 ; i <= this.options.numberOfAlternatives; i++) {
+        for (var i = 0; i <= this.options.numberOfAlternatives; i++) {
             (function (t, ii) {
                 var ci = t.currentRouteIdx;
-                var that = t;  
+                var that = t;
                 var request = t._buildRouteRequest(waypoints, options, responses, ii);
                 runRequest(url, request, t.options.token,
 
-                function (response) {
-                    if (hasError || t.currentRouteIdx !== ci)
-                        return;
+                    function (response) {
+                        if (hasError || t.currentRouteIdx !== ci)
+                            return;
 
-                    cnt++
-                    responses[ii] = response;
+                        cnt++;
+                        responses[ii] = response;
 
-                    if (cnt > that.options.numberOfAlternatives) {
-                        that._routeDone(responses, waypoints, callback, context);
-                    }
-                },
+                        if (cnt > that.options.numberOfAlternatives) {
+                            that._routeDone(responses, waypoints, callback, context);
+                        }
+                    },
 
-                function (xhr) {
-                    if (hasError || t.currentRouteIdx !== ci)
-                        return;
+                    function (xhr) {
+                        if (hasError || t.currentRouteIdx !== ci)
+                            return;
 
-                    hasError = true;
+                        hasError = true;
 
-                    console.log(xhr);
-                    callback.call(context, xhr, null);
-                });
+                        console.log(xhr);
+                        callback.call(context, xhr, null);
+                    });
             })(this, i);
-        };
+        }
     },
 
     _routeDone: function (responses, inputWaypoints, callback, context) {
@@ -72,7 +72,7 @@ L.Routing.Ptv = L.Class.extend({
             var coordinates = this._buildLinestring(response.polygon.lineString.points);
             alts.push({
                 segments: response.segments,
-                name: "Route " + (i + 1),
+                name: 'Route ' + (i + 1),
                 coordinates: coordinates,
                 instructions: this._bulidInstructions(response.manoeuvres, response.segments, response.stations),
                 summary: this._convertSummary(response.info),
@@ -80,9 +80,9 @@ L.Routing.Ptv = L.Class.extend({
                 waypoints: inputWaypoints,
                 waypointIndices: this._buildWaypointIndices(response.stations)
             });
-        }   
+        }
 
-        if (typeof this.options.routesCalculated === "function") {
+        if (typeof this.options.routesCalculated === 'function') {
             this.options.routesCalculated(alts, responses);
         }
 
@@ -100,44 +100,44 @@ L.Routing.Ptv = L.Class.extend({
         if (!this.options.supportsHeadings)
             return '';
         switch (manoeuvre.manoeuvreType) {
-            case 'UTURN':
-                return 'TurnAround';
-            case 'ENTER_RA':
-            case 'STAY_RA':
-            case 'EXIT_RA':
-            case 'EXIT_RA_ENTER':
-            case 'EXIT_RA_ENTER_FERRY':
-                return 'Roundabout';
-            case 'FURTHER':
-            case 'KEEP':
-            case 'CHANGE':
-            case 'ENTER':
-            case 'EXIT':
-            case 'ENTER_FERRY':
-            case 'EXIT_FERRY':
-                switch (manoeuvre.turnOrient) {
-                    case 'LEFT':
-                        return 'SlightLeft';
-                    case 'RIGHT':
-                        return 'SlightRight';
-                    default:
-                        return 'Straight';
+        case 'UTURN':
+            return 'TurnAround';
+        case 'ENTER_RA':
+        case 'STAY_RA':
+        case 'EXIT_RA':
+        case 'EXIT_RA_ENTER':
+        case 'EXIT_RA_ENTER_FERRY':
+            return 'Roundabout';
+        case 'FURTHER':
+        case 'KEEP':
+        case 'CHANGE':
+        case 'ENTER':
+        case 'EXIT':
+        case 'ENTER_FERRY':
+        case 'EXIT_FERRY':
+            switch (manoeuvre.turnOrient) {
+                case 'LEFT':
+                    return 'SlightLeft';
+                case 'RIGHT':
+                    return 'SlightRight';
+                default:
+                    return 'Straight';
                 }
-            case "TURN":
-                switch (manoeuvre.turnOrient) {
-                    case 'LEFT':
-                        return (manoeuvre.turnWeight == 'HALF') ? 'SlightLeft' : (manoeuvre.turnWeight == 'STRONG') ? 'SharpLeft' : 'Left';
-                    case 'RIGHT':
-                        return (manoeuvre.turnWeight == 'HALF') ? 'SlightRight' : (manoeuvre.turnWeight == 'STRONG') ? 'SharpRight' : 'Right';
-                    default:
-                        return 'Roundabout';
+        case 'TURN':
+            switch (manoeuvre.turnOrient) {
+                case 'LEFT':
+                    return (manoeuvre.turnWeight == 'HALF') ? 'SlightLeft' : (manoeuvre.turnWeight == 'STRONG') ? 'SharpLeft' : 'Left';
+                case 'RIGHT':
+                    return (manoeuvre.turnWeight == 'HALF') ? 'SlightRight' : (manoeuvre.turnWeight == 'STRONG') ? 'SharpRight' : 'Right';
+                default:
+                    return 'Roundabout';
                 }
-            default:
-                return 'Straight';
+        default:
+            return 'Straight';
         }
     },
 
-    _bulidInstructions: function(manoeuvres, segments, stations) {
+    _bulidInstructions: function (manoeuvres, segments, stations) {
         var instructions = [];
 
         if (!manoeuvres) {
@@ -163,14 +163,14 @@ L.Routing.Ptv = L.Class.extend({
                 exit: undefined,
                 index: station.polyIdx,
                 time: station.accTime,
-                type: (i == stations.length - 1) ? "DestinationReached" : (i == 0) ? "Straight" : "WaypointReached",
-                text: (i == stations.length - 1) ? "Destination" : (i == 0) ? "Start" : "WayPoint " + i
+                type: (i == stations.length - 1) ? 'DestinationReached' : (i == 0) ? 'Straight' : 'WaypointReached',
+                text: (i == stations.length - 1) ? 'Destination' : (i == 0) ? 'Start' : 'WayPoint ' + i
             });
         }
 
-        for (var i = instructions.length-1; i > 0 ; i--) {
-            instructions[i].distance = instructions[i].distance - instructions[i-1].distance;
-            instructions[i].time = instructions[i].time - instructions[i-1].time;
+        for (var i = instructions.length - 1; i > 0; i--) {
+            instructions[i].distance = instructions[i].distance - instructions[i - 1].distance;
+            instructions[i].time = instructions[i].time - instructions[i - 1].time;
         }
 
         for (var i = 1; i < instructions.length; i++) {
@@ -178,8 +178,8 @@ L.Routing.Ptv = L.Class.extend({
             instructions[i - 1].time = instructions[i].time;
         }
 
-        instructions[instructions.length-1].distance = 0;
-        instructions[instructions.length-1].time = 0;
+        instructions[instructions.length - 1].distance = 0;
+        instructions[instructions.length - 1].time = 0;
 
         return instructions;
     },
@@ -204,13 +204,13 @@ L.Routing.Ptv = L.Class.extend({
     _buildRouteRequest: function (waypoints, options, currentResponses, idx) {
         // var exceptionPaths = [];
         // if (currentResponses) {
-            // for (var i = 0; i < currentResponses.length; i++) {
-                // exceptionPaths.push(
-                // {
-                    // "binaryPathDesc": currentResponses[i].binaryPathDesc,
-                    // "relMalus": 1000
-                // });
-            // }
+        // for (var i = 0; i < currentResponses.length; i++) {
+        // exceptionPaths.push(
+        // {
+        // "binaryPathDesc": currentResponses[i].binaryPathDesc,
+        // "relMalus": 1000
+        // });
+        // }
         // }
 
         var wpCoords = [],
@@ -219,42 +219,38 @@ L.Routing.Ptv = L.Class.extend({
 
         for (var i = 0; i < waypoints.length; i++) {
             wpCoords.push({
-                "coords": [
-                  {
-                      "point": {
-                          "x": waypoints[i].latLng.lng,
-                          "y": waypoints[i].latLng.lat
-                      }
-                  }
-                ],
-                "linkType": "NEXT_SEGMENT"
+                'coords': [{
+                    'point': {
+                        'x': waypoints[i].latLng.lng,
+                        'y': waypoints[i].latLng.lat
+                    }
+                }],
+                'linkType': 'NEXT_SEGMENT'
             });
         }
 
-        computeAlternative = computeInstructions =
-            !(options && options.geometryOnly);
+        computeAlternative = computeInstructions = !(options && options.geometryOnly);
 
         var request = {
-            "waypoints": wpCoords,
-            "options": [],
-//            "exceptionPaths": exceptionPaths,
-            "details": {
-//                binaryPathDesc: currentResponses.length < this.options.numberOfAlternatives, // last route doesn't need exception paths
-                detailLevel: "STANDARD",
+            'waypoints': wpCoords,
+            'options': [],
+            //            "exceptionPaths": exceptionPaths,
+            'details': {
+                //                binaryPathDesc: currentResponses.length < this.options.numberOfAlternatives, // last route doesn't need exception paths
+                detailLevel: 'STANDARD',
                 polygon: true,
                 manoeuvres: true,
                 segments: true
             },
-            "callerContext": {
-                "properties": [
-                  {
-                      "key": "CoordFormat",
-                      "value": "OG_GEODECIMAL"
-                  }]
+            'callerContext': {
+                'properties': [{
+                    'key': 'CoordFormat',
+                    'value': 'OG_GEODECIMAL'
+                }]
             }
         };
 
-        if (typeof this.options.beforeSend === "function") {
+        if (typeof this.options.beforeSend === 'function') {
             request = this.options.beforeSend(request, currentResponses, idx);
         }
 

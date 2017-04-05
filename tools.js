@@ -3,20 +3,25 @@ function getXMapBaseLayers(cluster, style, token, attribution) {
     var isEastAsia = cluster.indexOf('cn-n') > -1 || cluster.indexOf('jp-n') > -1;
 
     var background = L.tileLayer('https://ajaxbg{s}-' + cluster + '.cloud.ptvgroup.com' +
-                     '/WMS/GetTile/' + ((style && !isEastAsia) ? 'xmap-ajaxbg-' + style : 'xmap-ajaxbg') +
-					 '/{x}/{y}/{z}.png' + ((isEastAsia) ? '?xtok=' + token : ''), {
-					     minZoom: 0, maxZoom: 19, opacity: 1.0,
-					     attribution: attribution,
-					     subdomains: '1234'
-					 });
+        '/WMS/GetTile/' + ((style && !isEastAsia) ? 'xmap-ajaxbg-' + style : 'xmap-ajaxbg') +
+        '/{x}/{y}/{z}.png' + ((isEastAsia) ? '?xtok=' + token : ''), {
+            minZoom: 0,
+            maxZoom: 19,
+            opacity: 1.0,
+            attribution: attribution,
+            subdomains: '1234'
+        });
 
     if (isEastAsia)
         return background;
 
     var foreground = new L.NonTiledLayer.WMS('https://ajaxfg-' + cluster + '.cloud.ptvgroup.com/WMS/WMS' + '?xtok=' + token, {
-        minZoom: 0, maxZoom: 19, opacity: 1.0,
+        minZoom: 0,
+        maxZoom: 19,
+        opacity: 1.0,
         layers: style ? 'xmap-ajaxfg-' + style : 'xmap-ajaxfg',
-        format: 'image/png', transparent: true,
+        format: 'image/png',
+        transparent: true,
         attribution: attribution
     });
 
@@ -30,12 +35,12 @@ function getXMapBaseLayers(cluster, style, token, attribution) {
 var runRequest = function (url, request, token, handleSuccess, handleError) {
     $.ajax({
         url: url,
-        type: "POST",
+        type: 'POST',
         data: JSON.stringify(request),
 
         headers: {
-            "Authorization": "Basic " + btoa("xtok:" + token),
-            "Content-Type": "application/json"
+            'Authorization': 'Basic ' + btoa('xtok:' + token),
+            'Content-Type': 'application/json'
         },
 
         success: function (data, status, xhr) {
@@ -50,13 +55,13 @@ var runRequest = function (url, request, token, handleSuccess, handleError) {
 
 var fixClickPropagationForIE = function (container) {
     container.onclick = L.DomEvent.stopPropagation;
-    var inputTags = container.getElementsByTagName("input");
-    var selectTags = container.getElementsByTagName("select");
+    var inputTags = container.getElementsByTagName('input');
+    var selectTags = container.getElementsByTagName('select');
     var elements = Array.prototype.slice.call(inputTags, 0);
     elements = elements.concat(Array.prototype.slice.call(selectTags, 0));
 
     for (var i = 0; i < elements.length; i++) {
-        if (elements[i].type == "text")
+        if (elements[i].type == 'text')
             elements[i].onclick = L.DomEvent.stopPropagation;
         elements[i].onmousedown = elements[i].ondblclick = elements[i].onpointerdown = L.DomEvent.stopPropagation;
     }

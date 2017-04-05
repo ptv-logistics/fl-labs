@@ -29,44 +29,43 @@ L.Control.Geocoder.Ptv = L.Class.extend({
         var url = this.options.serviceUrl + 'findAddressByText';
         // sample PTV xLocate request
         var request = {
-            "address": query,
-            "country": this.options.fixedCountry,
-            "options": [],
-            "sorting": [],
-            "additionalFields": [],
-            "callerContext": {
-                "properties": [
-                  {
-                      "key": "CoordFormat",
-                      "value": "OG_GEODECIMAL"
-                  },
-                  {
-                      "key": "Profile",
-                      "value": "default"
-                  }
+            'address': query,
+            'country': this.options.fixedCountry,
+            'options': [],
+            'sorting': [],
+            'additionalFields': [],
+            'callerContext': {
+                'properties': [{
+                    'key': 'CoordFormat',
+                    'value': 'OG_GEODECIMAL'
+                },
+                {
+                    'key': 'Profile',
+                    'value': 'default'
+                }
                 ]
             }
         };
 
         runRequest(url, request, this.options.token,
 
-function (response) {
-    var results = [];
-    for (var i = response.resultList.length - 1; i >= 0; i--) {
-        var resultAddress = response.resultList[i];
-        var loc = L.latLng(resultAddress.coordinates.point.y, resultAddress.coordinates.point.x);
-        results[i] = {
-            name: that._buildAddressString(resultAddress),
-            center: loc,
-            bbox: L.latLngBounds(loc, loc)
-        };
-    }
-    cb.call(context, results);
-},
+            function (response) {
+                var results = [];
+                for (var i = response.resultList.length - 1; i >= 0; i--) {
+                    var resultAddress = response.resultList[i];
+                    var loc = L.latLng(resultAddress.coordinates.point.y, resultAddress.coordinates.point.x);
+                    results[i] = {
+                        name: that._buildAddressString(resultAddress),
+                        center: loc,
+                        bbox: L.latLngBounds(loc, loc)
+                    };
+                }
+                cb.call(context, results);
+            },
 
-function (xhr) {
-    console.log(xhr);
-});
+            function (xhr) {
+                console.log(xhr);
+            });
     },
 
     reverse: function (location, scale, cb, context) {
@@ -74,48 +73,47 @@ function (xhr) {
         var url = this.options.serviceUrl + 'findLocation';
         // sample PTV xLocate request
         var request = {
-            "location": {
-                "coordinate": {
-                    "point": {
-                        "x": location.lng,
-                        "y": location.lat
+            'location': {
+                'coordinate': {
+                    'point': {
+                        'x': location.lng,
+                        'y': location.lat
                     }
                 }
             },
-            "options": [],
-            "sorting": [],
-            "additionalFields": [],
-            "callerContext": {
-                "properties": [
-                  {
-                      "key": "CoordFormat",
-                      "value": "OG_GEODECIMAL"
-                  },
-                  {
-                      "key": "Profile",
-                      "value": "default"
-                  }
+            'options': [],
+            'sorting': [],
+            'additionalFields': [],
+            'callerContext': {
+                'properties': [{
+                    'key': 'CoordFormat',
+                    'value': 'OG_GEODECIMAL'
+                },
+                {
+                    'key': 'Profile',
+                    'value': 'default'
+                }
                 ]
             }
-        }
+        };
 
         runRequest(url, request, this.options.token,
 
-function (response) {
-    if (response.resultList.length == 0)
-        return;
-    var resultAddress = response.resultList[0];
-    var loc = L.latLng(resultAddress.coordinates.point.y, resultAddress.coordinates.point.x);
-    cb.call(context, [{
-        name: that._buildAddressString(resultAddress),
-        center: loc,
-        bounds: L.latLngBounds(loc, loc)
-    }]);
-},
+            function (response) {
+                if (response.resultList.length == 0)
+                    return;
+                var resultAddress = response.resultList[0];
+                var loc = L.latLng(resultAddress.coordinates.point.y, resultAddress.coordinates.point.x);
+                cb.call(context, [{
+                    name: that._buildAddressString(resultAddress),
+                    center: loc,
+                    bounds: L.latLngBounds(loc, loc)
+                }]);
+            },
 
-function (xhr) {
-    console.log(xhr);
-});
+            function (xhr) {
+                console.log(xhr);
+            });
     }
 });
 

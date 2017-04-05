@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8" />
     <title>Feature Layer Labs</title>
@@ -16,12 +17,13 @@
             padding: 0;
             margin: 0;
         }
-
-        html, body, #map {
+        
+        html,
+        body,
+        #map {
             height: 100%;
             font: 10pt "Helvetica Neue", Arial, Helvetica, sans-serif;
         }
-
         /*h1, p {
             margin-top: 3em;
         }
@@ -33,37 +35,37 @@
         h3 {
             margin-top: 1em;
         }*/
-
+        
         .leaflet-top-pane {
             pointer-events: none;
         }
-
+        
         .travelMarker0 {
             fill: yellow;
             opacity: 0.75;
         }
-
+        
         .travelMarker1 {
             fill: #a00;
             opacity: 0.75;
         }
-
+        
         .travelMarker2 {
             fill: black;
             opacity: 0.5;
         }
-
+        
         .waypoints {
             fill: black;
             opacity: 0;
         }
-
+        
         .lineConnect {
             fill: none;
             stroke: black;
             opacity: 1;
         }
-
+        
         .leaflet-routing-alt i {
             width: 18px;
             height: 18px;
@@ -73,6 +75,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="github-fork-ribbon-wrapper right-bottom">
         <div class="github-fork-ribbon">
@@ -92,8 +95,7 @@
                     Feature Layer Labs
                 </h2>
                 <h3>
-                    You can change the waypoints by dragging them on the map or entering
-                    an address at the address input field.
+                    You can change the waypoints by dragging them on the map or entering an address at the address input field.
                 </h3>
                 <div>
                     <p>
@@ -155,7 +157,8 @@
                             <option>PT</option>
                         </select>
                     </div>
-                    <div><input type="checkbox" id="dynamicTimeOnStaticRoute" onchange="updateParams(false)">Show static Route /w dynamic Time</div>
+                    <div><input type="checkbox" id="dynamicTimeOnStaticRoute" onchange="updateParams(false)">Show static Route
+                        /w dynamic Time</div>
                     <div><input type="checkbox" id="staticTimeOnStaticRoute" onchange="updateParams(false)">Show static Route</div>
                     <div style="margin: 10px 0px 10px 0px;">
                         Replay Speed
@@ -216,6 +219,7 @@
     </div>
     <div id="map" class="map"></div>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.nontiledlayer@1.0.3/dist/NonTiledLayer.js"></script>
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="lib/d3.min.js" charset="utf-8"></script>
     <script src="lib/leaflet-routing-machine.js"></script>
@@ -223,7 +227,6 @@
     <script src="lib/leaflet.iconlabel.js"></script>
     <script src="lib/leaflet-sidebar.min.js"></script>
     <script src="lib/leaflet.contextmenu.js"></script>
-    <script src="lib/NonTiledLayer.js"></script>
     <script src="lib/moment.js"></script>
     <script src="lib/d3layer.js"></script>
     <script src="./Control.Geocoder.ptv.js"></script>
@@ -234,4 +237,5 @@
     <script src="./tools.js"></script>
     <script src="./index.js"></script>
 </body>
+
 </html>

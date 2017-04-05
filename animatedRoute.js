@@ -7,20 +7,28 @@ var buildD3Animations = function (alts, replaySpeed, doLoop) {
         map._panes.svgPane = map._createPane('leaflet-overlay-pane', map.getPanes().labelPane);
 
         // put the 'slowest' trace on tpo
-        d3Layer[2] = new L.SvgLayer({ pointerEvents: 'none', pane: map._panes.svgPane }).addTo(map);
-        d3Layer[0] = new L.SvgLayer({ pointerEvents: 'none', pane: map._panes.svgPane }).addTo(map);
-        d3Layer[1] = new L.SvgLayer({ pointerEvents: 'none', pane: map._panes.svgPane }).addTo(map);
+        d3Layer[2] = new L.SvgLayer({
+            pointerEvents: 'none',
+            pane: map._panes.svgPane
+        }).addTo(map);
+        d3Layer[0] = new L.SvgLayer({
+            pointerEvents: 'none',
+            pane: map._panes.svgPane
+        }).addTo(map);
+        d3Layer[1] = new L.SvgLayer({
+            pointerEvents: 'none',
+            pane: map._panes.svgPane
+        }).addTo(map);
 
         // setTimeout(function () { alert("Hello"); }, 3000);
 
         map.d3Layer = d3Layer;
-    }
-    else
+    } else
         d3Layer = map.d3Layer;
 
     // cancel pending animations
     for (var i = 0; i < 3; i++) {
-        var animId = "anim" + i;
+        var animId = 'anim' + i;
         d3.select('#tr' + animId).transition().duration(0);
     }
 
@@ -43,14 +51,16 @@ var buildD3Animations = function (alts, replaySpeed, doLoop) {
             maxTime = Math.max(maxTime, t);
         }
 
-        map.timeOut = setTimeout(function () { buildD3Animations(alts, replaySpeed, doLoop); }, maxTime / replaySpeed * 1000);
+        map.timeOut = setTimeout(function () {
+            buildD3Animations(alts, replaySpeed, doLoop);
+        }, maxTime / replaySpeed * 1000);
     }
 
     for (var i = 0; i < alts.length; i++) {
         var svg = d3.select(d3Layer[i].getPathRoot());
         buildD3Animation(alts[i], i, d3Layer[i], svg, replaySpeed);
     }
-}
+};
 
 var buildD3Animation = function (route, index, layer, svg, replaySpeed) {
     if (!route)
@@ -62,27 +72,27 @@ var buildD3Animation = function (route, index, layer, svg, replaySpeed) {
     var sumTime = route.segments[route.segments.length - 1].accTime;
     var sumDist = route.segments[route.segments.length - 1].accDist;
 
-    var animId = "anim" + index;
+    var animId = 'anim' + index;
 
-    g = svg.append("g");
-    g.attr("id", animId);
+    g = svg.append('g');
+    g.attr('id', animId);
 
     var collection = {};
     collection.features = [];
 
     for (var i = 0; i < route.polygon.lineString.points.length; i++) {
         collection.features[i] = {
-            type: "feature",
+            type: 'feature',
             properties: {
                 time: i + 1,
                 name: i + 1,
-                id: "route1"
+                id: 'route1'
             },
             geometry: {
-                type: "Point",
+                type: 'Point',
                 coordinates: [route.polygon.lineString.points[i].x, route.polygon.lineString.points[i].y]
             }
-        }
+        };
     }
 
     //read in the GeoJSON. This function is asynchronous so
@@ -136,21 +146,25 @@ var buildD3Animation = function (route, index, layer, svg, replaySpeed) {
     // single line. For now these are basically points
     // but below we set the "d" attribute using the
     // line creator function from above.
-    var linePath = g.selectAll(".lineConnect")
+    var linePath = g.selectAll('.lineConnect')
         .data([featuresdata])
         .enter()
-        .append("path")
-        .attr("id", "tr" + animId)
-        .attr("class", "lineConnect")
-        .style({ 'stroke': 'Blue', 'fill': 'none', 'stroke-width': '6px' })
-        .style("opacity", ".6");
+        .append('path')
+        .attr('id', 'tr' + animId)
+        .attr('class', 'lineConnect')
+        .style({
+            'stroke': 'Blue',
+            'fill': 'none',
+            'stroke-width': '6px'
+        })
+        .style('opacity', '.6');
 
     // This will be our traveling circle it will
     // travel along our path
-    var marker = g.append("circle")
-        .attr("r", (index == 0) ? 12 : 10)
-        .attr("id", "marker" + index)
-        .attr("class", "travelMarker" + index);
+    var marker = g.append('circle')
+        .attr('r', (index == 0) ? 12 : 10)
+        .attr('id', 'marker' + index)
+        .attr('class', 'travelMarker' + index);
 
 
     // For simplicity I hard-coded this! I'm taking
@@ -173,18 +187,18 @@ var buildD3Animation = function (route, index, layer, svg, replaySpeed) {
         // again, not best practice, but I'm harding coding
         // the starting point
 
-        marker.attr("transform",
+        marker.attr('transform',
             function () {
                 var y = featuresdata[0].geometry.coordinates[1];
                 var x = featuresdata[0].geometry.coordinates[0];
-                return "translate(" +
-                    map.latLngToLayerPoint(new L.LatLng(y, x)).x + "," +
-                    map.latLngToLayerPoint(new L.LatLng(y, x)).y + ")";
+                return 'translate(' +
+                    map.latLngToLayerPoint(new L.LatLng(y, x)).x + ',' +
+                    map.latLngToLayerPoint(new L.LatLng(y, x)).y + ')';
             });
 
 
         // linePath.attr("d", d3path);
-        linePath.attr("d", toLine);
+        linePath.attr('d', toLine);
 
     } // end reset
 
@@ -202,12 +216,12 @@ var buildD3Animation = function (route, index, layer, svg, replaySpeed) {
     function transition() {
         linePath.transition()
             .duration(sumTime * 1000 / replaySpeed)
-            .ease("linear")
-            .attrTween("stroke-dasharray", tweenDash)
-            .each("interrupt", function () {
+            .ease('linear')
+            .attrTween('stroke-dasharray', tweenDash)
+            .each('interrupt', function () {
                 d3.select('#' + animId).remove();
             })
-            .each("end", function () {
+            .each('end', function () {
                 //              d3.select(this).call(transition);// infinite loop
                 d3.select('#' + animId).remove();
             });
@@ -226,11 +240,9 @@ var buildD3Animation = function (route, index, layer, svg, replaySpeed) {
 
             if (currentElement < searchElement) {
                 minIndex = currentIndex + 1;
-            }
-            else if (currentElement >= searchElement && (currentIndex > 0 && segments[currentIndex - 1].accTime >= searchElement)) {
+            } else if (currentElement >= searchElement && (currentIndex > 0 && segments[currentIndex - 1].accTime >= searchElement)) {
                 maxIndex = currentIndex - 1;
-            }
-            else {
+            } else {
                 return currentIndex;
             }
         }
@@ -277,9 +289,9 @@ var buildD3Animation = function (route, index, layer, svg, replaySpeed) {
             // total line length, though is only 500 to begin with this
             // essentially says give me a line of 250px followed by a gap
             // of 250px.
-            interpolate = d3.interpolateString("0," + l, l + "," + l);
+            interpolate = d3.interpolateString('0,' + l, l + ',' + l);
             //t is fraction of time 0-1 since transition began
-            var marker = d3.select("#marker" + index);
+            var marker = d3.select('#marker' + index);
 
             // p is the point on the line (coordinates) at a given length
             // along the line. In this case if l=50 and we're midway through
@@ -287,7 +299,7 @@ var buildD3Animation = function (route, index, layer, svg, replaySpeed) {
             var p = linePath.node().getPointAtLength(t * l);
 
             //Move the marker to that point
-            marker.attr("transform", "translate(" + p.x + "," + p.y + ")"); //move marker
+            marker.attr('transform', 'translate(' + p.x + ',' + p.y + ')'); //move marker
             //console.log(t + " " + l + " " + interpolate(t))
             return interpolate(t);
         };
