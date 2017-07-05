@@ -837,26 +837,24 @@ L.PtvLayer.FeatureLayer = L.Layer.extend({
     },
 
     onAdd: function (map) {
-        this._map = map;
         this.visible = true;
-        this.redraw();
+        this.redraw(map);
     },
 
     onRemove: function (map) {
         this.visible = false;
         var that = this;
         setTimeout(function () {
-            that.redraw();
+            that.redraw(map);
         }, 0);
     },
 
-    redraw: function () {
-        if (this._map) {
-            this._map.eachLayer(function (layer) {
+    redraw: function (map) {
+        map.eachLayer(function (layer) {
                 if (layer.type === 'FeatureLayerBg' || layer.type === 'FeatureLayerFg')
                     layer.redraw();
             });
-        }
+
         return this;
     },
     type: 'FeatureLayer'

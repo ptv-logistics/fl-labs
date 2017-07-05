@@ -137,52 +137,53 @@ L.Routing.Ptv = L.Class.extend({
         }
     },
 
-    _bulidInstructions: function (manoeuvres, segments, stations) {
-        var instructions = [];
+	_bulidInstructions: function (manoeuvres, segments, stations) {
+		var instructions = [];
 
-        if (!manoeuvres) {
-            return instructions;
-        }
+		if (!manoeuvres) {
+			return instructions;
+		}
 
-        for (var i = 0; i < manoeuvres.length; i++) {
-            var manoeuvre = manoeuvres[i];
-            instructions.push({
-                distance: segments[manoeuvre.routeListSegmentIdx].accDist,
-                exit: undefined,
-                index: segments[manoeuvre.routeListSegmentIdx].firstPolyIdx,
-                time: segments[manoeuvre.routeListSegmentIdx].accTime,
-                type: this._drivingDirectionType(manoeuvre),
-                text: manoeuvre.manoeuvreDesc
-            });
-        }
+		for (var i = 0; i < manoeuvres.length; i++) {
+			var manoeuvre = manoeuvres[i];
+			instructions.push({
+				distance: segments[manoeuvre.routeListSegmentIdx].accDist,
+				exit: undefined,
+				index: segments[manoeuvre.routeListSegmentIdx].firstPolyIdx,
+				time: segments[manoeuvre.routeListSegmentIdx].accTime,
+				type: this._drivingDirectionType(manoeuvre),
+				modifier: this._drivingDirectionType(manoeuvre),
+				text: manoeuvre.manoeuvreDesc
+			});
+		}
 
-        for (var i = stations.length - 1; i >= 0; i--) {
-            var station = stations[i];
-            instructions.splice(station.manoeuvreIdx, 0, {
-                distance: station.accDist,
-                exit: undefined,
-                index: station.polyIdx,
-                time: station.accTime,
-                type: (i == stations.length - 1) ? 'DestinationReached' : (i == 0) ? 'Straight' : 'WaypointReached',
-                text: (i == stations.length - 1) ? 'Destination' : (i == 0) ? 'Start' : 'WayPoint ' + i
-            });
-        }
+		for (i = stations.length - 1; i >= 0; i--) {
+			var station = stations[i];
+			instructions.splice(station.manoeuvreIdx, 0, {
+				distance: station.accDist,
+				exit: undefined,
+				index: station.polyIdx,
+				time: station.accTime,
+				type: (i === stations.length - 1) ? 'DestinationReached' : (i === 0) ? 'Head' : 'WaypointReached',
+				text: (i === stations.length - 1) ? 'Destination' : (i === 0) ? 'Start' : 'WayPoint ' + i
+			});
+		}
 
-        for (var i = instructions.length - 1; i > 0; i--) {
-            instructions[i].distance = instructions[i].distance - instructions[i - 1].distance;
-            instructions[i].time = instructions[i].time - instructions[i - 1].time;
-        }
+		for (i = instructions.length - 1; i > 0; i--) {
+			instructions[i].distance = instructions[i].distance - instructions[i - 1].distance;
+			instructions[i].time = instructions[i].time - instructions[i - 1].time;
+		}
 
-        for (var i = 1; i < instructions.length; i++) {
-            instructions[i - 1].distance = instructions[i].distance;
-            instructions[i - 1].time = instructions[i].time;
-        }
+		for (i = 1; i < instructions.length; i++) {
+			instructions[i - 1].distance = instructions[i].distance;
+			instructions[i - 1].time = instructions[i].time;
+		}
 
-        instructions[instructions.length - 1].distance = 0;
-        instructions[instructions.length - 1].time = 0;
+		instructions[instructions.length - 1].distance = 0;
+		instructions[instructions.length - 1].time = 0;
 
-        return instructions;
-    },
+		return instructions;
+	},
 
     _buildLinestring: function (inputpoints) {
         var points = [];

@@ -199,8 +199,8 @@ var updateParams = function (refreshFeatureLayer, setTimeNow) {
     routingProfile = $('#routingProfile option:selected').val();
 
     if (refreshFeatureLayer || setTimeNow) {
-        speedPatterns.redraw();
-        //        incidents.redraw();
+        speedPatterns.redraw(map);
+
     }
 
     routingControl._router.options.numberOfAlternatives = ((dynamicTimeOnStaticRoute) ? 1 : 0) + ((staticTimeOnStaticRoute) ? 1 : 0);
