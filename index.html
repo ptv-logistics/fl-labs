@@ -4,12 +4,12 @@
 <head>
     <meta charset="utf-8" />
     <title>Feature Layer Labs</title>
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
-    <link rel="stylesheet" href="lib/leaflet-routing-machine.css" />
-    <link rel="stylesheet" href="lib/leaflet.iconlabel.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.1.0/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.5/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="https://unpkg.com/sidebar-v2@0.3.1/css/leaflet-sidebar.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-contextmenu@1.4.0/dist/leaflet.contextmenu.min.css">
     <link rel="stylesheet" href="lib/forkme.css" />
-    <link rel="stylesheet" href="lib/leaflet-sidebar.min.css" />
-    <link rel="stylesheet" href="lib/leaflet.contextmenu.css">
     <link rel="stylesheet" href="index.css" />
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
     <style>
@@ -217,21 +217,23 @@
             </div>
         </div>
     </div>
-    <div id="map" class="map"></div>
-    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.nontiledlayer@1.0.4/dist/NonTiledLayer.js"></script>
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="lib/d3.min.js" charset="utf-8"></script>
-    <script src="lib/leaflet-routing-machine.js"></script>
-    <script src="lib/Control.Geocoder.js"></script>
-    <script src="lib/leaflet.iconlabel.js"></script>
-    <script src="lib/leaflet-sidebar.min.js"></script>
-    <script src="lib/leaflet.contextmenu.js"></script>
-    <script src="lib/moment.js"></script>
-    <script src="lib/d3layer.js"></script>
+    <div id="map" class="sidebar-map"></div>
+
+    <script src="https://unpkg.com/jquery@3.2.1/dist/jquery.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.1.0/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-xserver@1.0.2/dist/leaflet-xserver.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.5/dist/leaflet-routing-machine.min.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder@1.5.4/dist/Control.Geocoder.js"></script>
+    <script src="https://unpkg.com/sidebar-v2@0.3.1/js/leaflet-sidebar.min.js"></script>
+    <script src="https://unpkg.com/leaflet-contextmenu@1.4.0/dist/leaflet.contextmenu.min.js"></script>
+    <script src="https://unpkg.com/leaflet.icon.glyph@0.2.0/Leaflet.Icon.Glyph.js"></script>
+    <script src="https://unpkg.com/d3@3.5.5/d3.min.js"></script>
+    <script src="https://unpkg.com/moment@2.18.1/min/moment.min.js"></script>
+    
     <script src="./Control.Geocoder.ptv.js"></script>
     <script src="./Leaflet.PtvLayer.js"></script>
     <script src="./routing-machine-ptv.js"></script>
+    <script src="./d3layer.js"></script>
     <script src="./animatedRoute.js"></script>
     <script src="./token.js"></script>
     <script src="./tools.js"></script>

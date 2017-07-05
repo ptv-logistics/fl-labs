@@ -4,7 +4,7 @@
 L.PtvLayer = L.NonTiledLayer.extend({
     defaultXMapParams: {
         format: 'PNG',
-        token: '',
+        token: '', 
         markerIsBalloon: false
     },
 
@@ -350,6 +350,9 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
     },
 
     onAdd: function (map) {
+        L.TileLayer.prototype.onAdd.call(this, map);
+        return;
+
         this._map = map;
 
         this.requestQueue = [];
@@ -358,8 +361,131 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
         for (var i = 0; i < this.currentRequests.length; i++)
             this.currentRequests[i].abort();
         this.currentRequests = [];
+    },
 
-        L.TileLayer.prototype.onAdd.call(this, map);
+	createTile: function (coords, done) {
+		var tile = document.createElement('img');
+
+		L.DomEvent.on(tile, 'load', L.bind(this._tileOnLoad, this, done, tile));
+		L.DomEvent.on(tile, 'error', L.bind(this._tileOnError, this, done, tile));
+
+		if (this.options.crossOrigin) {
+			tile.crossOrigin = '';
+		}
+
+        /*
+         Alt tag is set to empty string to keep screen readers from reading URL and for compliance reasons
+         http://www.w3.org/TR/WCAG20-TECHS/H67
+        */
+		tile.alt = '';
+
+        /*
+         Set role="presentation" to force screen readers to ignore this
+         https://www.w3.org/TR/wai-aria/roles#textalternativecomputation
+        */
+		tile.setAttribute('role', 'presentation');
+
+        var self = this,
+            map = this._map,
+            crs = map.options.crs,
+            tileSize = this.options.tileSize,
+		    tileBounds = this._tileCoordsToBounds(coords),
+		    nw = tileBounds.getNorthWest(),
+		    se = tileBounds.getSouthEast(),
+            wbbox = tileBounds;
+
+        var mapSection = {
+            leftTop: {
+                '$type': 'Point',
+                point: {
+                    '$type': 'PlainPoint',
+                    x: wbbox.getNorthWest().lng,
+                    y: wbbox.getNorthWest().lat
+                }
+            },
+            rightBottom: {
+                '$type': 'Point',
+                point: {
+                    '$type': 'PlainPoint',
+                    x: wbbox.getSouthEast().lng,
+                    y: wbbox.getSouthEast().lat
+                }
+            }
+        };
+
+        var mapParams = {
+            showScale: false,
+            useMiles: false
+        };
+
+        var imageInfo = {
+            format: this.options.format,
+            width: tileSize,
+            height: tileSize
+        };
+
+        var layers = [];
+        var includeImageInResponse = true;
+
+        var callerContext = {
+            properties: [{
+                key: 'Profile',
+                value: 'ajax-bg'
+            }, {
+                key: 'CoordFormat',
+                value: 'OG_GEODECIMAL'
+            }]
+        };
+
+        if (typeof this.options.beforeSend === 'function') {
+            var req = this.options.beforeSend({
+                mapSection: mapSection,
+                mapParams: mapParams,
+                imageInfo: imageInfo,
+                layers: layers,
+                includeImageInResponse: includeImageInResponse,
+                callerContext: callerContext
+            });
+            mapSection = req.mapSection;
+            mapParams = req.mapParams;
+            imageInfo = req.imageInfo;
+            layers = req.layers;
+            includeImageInResponse = req.includeImageInResponse;
+            callerContext = req.callerContext;
+        }
+
+        var request = {
+            'mapSection': mapSection,
+            'mapParams': mapParams,
+            'imageInfo': imageInfo,
+            'layers': layers,
+            'includeImageInResponse': includeImageInResponse,
+            'callerContext': callerContext
+        };
+
+		tile._map = this._map;
+		tile._layers = [];
+
+        this.runRequestQ(
+            this.url + '/xmap/rs/XMap/renderMapBoundingBox',
+            request,
+            this.options.token,
+
+            function (response) {
+                var prefixMap = {
+                    'iVBOR': 'data:image/png;base64,',
+                    'R0lGO': 'data:image/gif;base64,',
+                    '/9j/4': 'data:image/jpeg;base64,',
+                    'Qk02U': 'data:image/bmp;base64,'
+                };
+                var rawImage = response.image.rawImage;
+
+                tile.src = prefixMap[rawImage.substr(0, 5)] + rawImage;
+            },
+
+            function (xhr) {});
+
+            return tile;
     },
 
     onRemove: function (map) {
@@ -453,7 +579,7 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
             map = this._map,
             crs = map.options.crs,
             tileSize = this.options.tileSize,
-            zoom = this._map.getZoom(),
+            zoom = this._map.tZoom(),
             nwPoint = tilePoint.multiplyBy(tileSize),
             sePoint = nwPoint.add(new L.Point(tileSize, tileSize)),
             nw = crs.project(map.unproject(nwPoint, zoom)),
@@ -693,7 +819,7 @@ L.PtvLayer.FeatureLayerBg = L.PtvLayer.Tiled.extend({
     type: 'FeatureLayerBg'
 });
 
-L.PtvLayer.FeatureLayer = L.Class.extend({
+L.PtvLayer.FeatureLayer = L.Layer.extend({
     includes: L.Mixin.Events,
     options: {
         name: ''

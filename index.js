@@ -43,8 +43,9 @@ var map = L.map('map', {
 var attribution = '<a href="http://www.ptvgroup.com">PTV</a>, TOMTOM';
 
 // create a separate pane for the xmap labels, so they are displayed on top of the route line
-// http://bl.ocks.org/rsudekum/5431771
-map._panes.labelPane = map._createPane('leaflet-top-pane', map.getPanes().shadowPane);
+map.createPane('labels');
+map.getPane('labels').style.zIndex = 500;
+map.getPane('labels').style.pointerEvents = 'none';
 
 map.setView([0, 0], 0);
 
@@ -74,7 +75,7 @@ var getLayers = function (profile) {
         token: token,
         attribution: attribution,
         profile: profile + '-fg',
-        pane: map._panes.labelPane,
+        pane: 'labels',
         beforeSend2: function (request) {
             request.mapParams.referenceTime = hour.format();
 
@@ -208,14 +209,14 @@ var updateParams = function (refreshFeatureLayer, setTimeNow) {
 
 var routingControl = L.Routing.control({
     plan: L.Routing.plan([], {
-        createMarker: function (i, wp) {
-            return L.marker(wp.latLng, {
-                draggable: true,
-                icon: new L.Icon.Label.Default({
-                    labelText: String.fromCharCode(65 + i)
-                })
-            });
-        },
+		createMarker: function (i, wp) {
+			return L.marker(wp.latLng, {
+				draggable: true,
+				icon: L.icon.glyph({
+					glyph: String.fromCharCode(65 + i)
+				})
+			});
+		},
         geocoder: L.Control.Geocoder.ptv({
             serviceUrl: 'https://api-eu-test.cloud.ptvgroup.com/xlocate/rs/XLocate/',
             token: token
