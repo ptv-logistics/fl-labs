@@ -209,14 +209,14 @@ var updateParams = function (refreshFeatureLayer, setTimeNow) {
 
 var routingControl = L.Routing.control({
     plan: L.Routing.plan([], {
-		createMarker: function (i, wp) {
-			return L.marker(wp.latLng, {
-				draggable: true,
-				icon: L.icon.glyph({
-					glyph: String.fromCharCode(65 + i)
-				})
-			});
-		},
+        createMarker: function (i, wp) {
+            return L.marker(wp.latLng, {
+                draggable: true,
+                icon: L.icon.glyph({
+                    glyph: String.fromCharCode(65 + i)
+                })
+            });
+        },
         geocoder: L.Control.Geocoder.ptv({
             serviceUrl: 'https://api-eu-test.cloud.ptvgroup.com/xlocate/rs/XLocate/',
             token: token
@@ -298,7 +298,8 @@ var routingControl = L.Routing.control({
         roundingSensitivity: 1000
     }),
     routeWhileDragging: false,
-    routeDragInterval: 1000
+    routeDragInterval: 1000,    
+    collapsible: true
 }).addTo(map);
 
 routingControl.on('routingerror', function (e) {

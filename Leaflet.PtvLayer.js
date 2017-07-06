@@ -351,7 +351,6 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
 
     onAdd: function (map) {
         L.TileLayer.prototype.onAdd.call(this, map);
-        return;
 
         this._map = map;
 
@@ -363,35 +362,35 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
         this.currentRequests = [];
     },
 
-	createTile: function (coords, done) {
-		var tile = document.createElement('img');
+    createTile: function (coords, done) {
+        var tile = document.createElement('img');
 
-		L.DomEvent.on(tile, 'load', L.bind(this._tileOnLoad, this, done, tile));
-		L.DomEvent.on(tile, 'error', L.bind(this._tileOnError, this, done, tile));
+        L.DomEvent.on(tile, 'load', L.bind(this._tileOnLoad, this, done, tile));
+        L.DomEvent.on(tile, 'error', L.bind(this._tileOnError, this, done, tile));
 
-		if (this.options.crossOrigin) {
-			tile.crossOrigin = '';
-		}
+        if (this.options.crossOrigin) {
+            tile.crossOrigin = '';
+        }
 
         /*
          Alt tag is set to empty string to keep screen readers from reading URL and for compliance reasons
          http://www.w3.org/TR/WCAG20-TECHS/H67
         */
-		tile.alt = '';
+        tile.alt = '';
 
         /*
          Set role="presentation" to force screen readers to ignore this
          https://www.w3.org/TR/wai-aria/roles#textalternativecomputation
         */
-		tile.setAttribute('role', 'presentation');
+        tile.setAttribute('role', 'presentation');
 
         var self = this,
             map = this._map,
             crs = map.options.crs,
             tileSize = this.options.tileSize,
-		    tileBounds = this._tileCoordsToBounds(coords),
-		    nw = tileBounds.getNorthWest(),
-		    se = tileBounds.getSouthEast(),
+            tileBounds = this._tileCoordsToBounds(coords),
+            nw = tileBounds.getNorthWest(),
+            se = tileBounds.getSouthEast(),
             wbbox = tileBounds;
 
         var mapSection = {
@@ -463,8 +462,8 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
             'callerContext': callerContext
         };
 
-		tile._map = this._map;
-		tile._layers = [];
+        tile._map = this._map;
+        tile._layers = [];
 
         this.runRequestQ(
             this.url + '/xmap/rs/XMap/renderMapBoundingBox',
@@ -485,7 +484,7 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
 
             function (xhr) {});
 
-            return tile;
+        return tile;
     },
 
     onRemove: function (map) {
@@ -575,19 +574,15 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
     },
 
     _requestTile: function (tile, tilePoint) {
-        var self = this,
-            map = this._map,
+        var map = this._map,
             crs = map.options.crs,
             tileSize = this.options.tileSize,
             zoom = this._map.tZoom(),
             nwPoint = tilePoint.multiplyBy(tileSize),
-            sePoint = nwPoint.add(new L.Point(tileSize, tileSize)),
-            nw = crs.project(map.unproject(nwPoint, zoom)),
-            se = crs.project(map.unproject(sePoint, zoom)),
-            bbox = new L.LatLngBounds([se.y, nw.x], [nw.y, se.x]),
+            sePoint = nwPoint.add(L.point(tileSize, tileSize)),
             wnw = map.unproject(nwPoint, zoom),
             wse = map.unproject(sePoint, zoom),
-            wbbox = new L.LatLngBounds([wse.lat, wnw.lng], [wnw.lat, wse.lng]);
+            wbbox = L.latLngBounds([wse.lat, wnw.lng], [wnw.lat, wse.lng]);
 
         var mapSection = {
             leftTop: {
