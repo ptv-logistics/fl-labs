@@ -354,12 +354,7 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
 
         this._map = map;
 
-        this.requestQueue = [];
-        this.cnt = this.cnt + 1;
-        this.activeRequestCount = 0;
-        for (var i = 0; i < this.currentRequests.length; i++)
-            this.currentRequests[i].abort();
-        this.currentRequests = [];
+        this._resetQueue();
     },
 
     createTile: function (coords, done) {
@@ -488,25 +483,12 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
     },
 
     onRemove: function (map) {
-        this.requestQueue = [];
-        this.cnt = this.cnt + 1;
-        this.activeRequestCount = 0;
-        for (var i = 0; i < this.currentRequests.length; i++)
-            this.currentRequests[i].abort();
-        this.currentRequests = [];
+        this._resetQueue();
 
         L.TileLayer.prototype.onRemove.call(this, map);
     },
 
-    _loadTile: function (tile, tilePoint) {
-        tile._layer = this;
-        tile.onload = this._tileOnLoad;
-        tile.onerror = this._tileOnError;
-
-        this._requestTile(tile, tilePoint);
-    },
-
-    _reset: function () {
+    _resetQueue: function() {
         this.requestQueue = [];
         this.cnt = this.cnt + 1;
         for (var i = 0; i < this.currentRequests.length; i++)
@@ -514,7 +496,12 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
         this.currentRequests = [];
 
         this.activeRequestCount = 0;
-        L.TileLayer.prototype._reset.call(this);
+     },
+
+    redraw: function () {
+        this._resetQueue();
+
+		L.TileLayer.prototype.redraw.call(this);
     },
 
     cnt: 0,
@@ -571,106 +558,6 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
         });
 
         this.currentRequests.push(request);
-    },
-
-    _requestTile: function (tile, tilePoint) {
-        var map = this._map,
-            crs = map.options.crs,
-            tileSize = this.options.tileSize,
-            zoom = this._map.tZoom(),
-            nwPoint = tilePoint.multiplyBy(tileSize),
-            sePoint = nwPoint.add(L.point(tileSize, tileSize)),
-            wnw = map.unproject(nwPoint, zoom),
-            wse = map.unproject(sePoint, zoom),
-            wbbox = L.latLngBounds([wse.lat, wnw.lng], [wnw.lat, wse.lng]);
-
-        var mapSection = {
-            leftTop: {
-                '$type': 'Point',
-                point: {
-                    '$type': 'PlainPoint',
-                    x: wbbox.getNorthWest().lng,
-                    y: wbbox.getNorthWest().lat
-                }
-            },
-            rightBottom: {
-                '$type': 'Point',
-                point: {
-                    '$type': 'PlainPoint',
-                    x: wbbox.getSouthEast().lng,
-                    y: wbbox.getSouthEast().lat
-                }
-            }
-        };
-
-        var mapParams = {
-            showScale: false,
-            useMiles: false
-        };
-
-        var imageInfo = {
-            format: this.options.format,
-            width: tileSize,
-            height: tileSize
-        };
-
-        var layers = [];
-        var includeImageInResponse = true;
-
-        var callerContext = {
-            properties: [{
-                key: 'Profile',
-                value: 'ajax-bg'
-            }, {
-                key: 'CoordFormat',
-                value: 'OG_GEODECIMAL'
-            }]
-        };
-
-        if (typeof this.options.beforeSend === 'function') {
-            var req = this.options.beforeSend({
-                mapSection: mapSection,
-                mapParams: mapParams,
-                imageInfo: imageInfo,
-                layers: layers,
-                includeImageInResponse: includeImageInResponse,
-                callerContext: callerContext
-            });
-            mapSection = req.mapSection;
-            mapParams = req.mapParams;
-            imageInfo = req.imageInfo;
-            layers = req.layers;
-            includeImageInResponse = req.includeImageInResponse;
-            callerContext = req.callerContext;
-        }
-
-        var request = {
-            'mapSection': mapSection,
-            'mapParams': mapParams,
-            'imageInfo': imageInfo,
-            'layers': layers,
-            'includeImageInResponse': includeImageInResponse,
-            'callerContext': callerContext
-        };
-
-        this.runRequestQ(
-            this.url + '/xmap/rs/XMap/renderMapBoundingBox',
-            request,
-            this.options.token,
-
-            function (response) {
-                var prefixMap = {
-                    'iVBOR': 'data:image/png;base64,',
-                    'R0lGO': 'data:image/gif;base64,',
-                    '/9j/4': 'data:image/jpeg;base64,',
-                    'Qk02U': 'data:image/bmp;base64,'
-                };
-                var rawImage = response.image.rawImage;
-
-                tile.src = prefixMap[rawImage.substr(0, 5)] + rawImage;
-            },
-
-            function (xhr) {});
     }
 });
 
@@ -815,7 +702,6 @@ L.PtvLayer.FeatureLayerBg = L.PtvLayer.Tiled.extend({
 });
 
 L.PtvLayer.FeatureLayer = L.Layer.extend({
-    includes: L.Mixin.Events,
     options: {
         name: ''
     },

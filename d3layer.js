@@ -182,3 +182,7 @@ L.SvgLayer = L.Layer.extend({
         }
     }
 });
+
+L.svgLayer = function (options) {
+    return new L.SvgLayer(options);
+};

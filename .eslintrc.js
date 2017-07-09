@@ -20,5 +20,11 @@ module.exports = {
             "error",
             "always"
         ]
-    }
+    },
+    "globals": {
+        "L": true,
+        "d3": true,
+        "module": false,
+        "define": false
+  }
 };

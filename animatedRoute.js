@@ -8,20 +8,18 @@ var buildD3Animations = function (alts, replaySpeed, doLoop) {
         map.getPane('svgPane').style.pointerEvents = 'none';
 
         // put the 'slowest' trace on tpo
-        d3Layer[2] = new L.SvgLayer({
+        d3Layer[2] = L.svgLayer({
             pointerEvents: 'none',
             pane: map._panes.svgPane
         }).addTo(map);
-        d3Layer[0] = new L.SvgLayer({
+        d3Layer[0] = L.svgLayer({
             pointerEvents: 'none',
             pane: map._panes.svgPane
         }).addTo(map);
-        d3Layer[1] = new L.SvgLayer({
+        d3Layer[1] = L.svgLayer({
             pointerEvents: 'none',
             pane: map._panes.svgPane
         }).addTo(map);
-
-        // setTimeout(function () { alert("Hello"); }, 3000);
 
         map.d3Layer = d3Layer;
     } else
@@ -193,8 +191,8 @@ var buildD3Animation = function (route, index, layer, svg, replaySpeed) {
                 var y = featuresdata[0].geometry.coordinates[1];
                 var x = featuresdata[0].geometry.coordinates[0];
                 return 'translate(' +
-                    map.latLngToLayerPoint(new L.LatLng(y, x)).x + ',' +
-                    map.latLngToLayerPoint(new L.LatLng(y, x)).y + ')';
+                    map.latLngToLayerPoint(L.latLng(y, x)).x + ',' +
+                    map.latLngToLayerPoint(L.latLng(y, x)).y + ')';
             });
 
 
@@ -311,7 +309,7 @@ var buildD3Animation = function (route, index, layer, svg, replaySpeed) {
     //Returns the map layer point that corresponds to the given geographical
     // coordinates (useful for placing overlays on the map).
     function projectPoint(x, y) {
-        var point = map.latLngToLayerPoint(new L.LatLng(y, x));
+        var point = map.latLngToLayerPoint(L.latLng(y, x));
         this.stream.point(point.x, point.y);
     } //end projectPoint
 };
@@ -324,5 +322,5 @@ var buildD3Animation = function (route, index, layer, svg, replaySpeed) {
 function applyLatLngToLayer(d) {
     var y = d.geometry.coordinates[1];
     var x = d.geometry.coordinates[0];
-    return map.latLngToLayerPoint(new L.LatLng(y, x));
+    return map.latLngToLayerPoint(L.latLng(y, x));
 }
