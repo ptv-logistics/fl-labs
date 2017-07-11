@@ -64,7 +64,7 @@ var buildD3Animations = function (map, alts, replaySpeed, doLoop) {
         buildD3Animation(alts[i], i, d3Layer[i], svg, replaySpeed);
     }
 
-    function buildD3Animation (route, index, layer, svg, replaySpeed) {
+    function buildD3Animation(route, index, layer, svg, replaySpeed) {
         if (!route)
             return;
 
@@ -79,7 +79,7 @@ var buildD3Animations = function (map, alts, replaySpeed, doLoop) {
         var g = svg.append('g')
             .attr('id', animId);
 
-        
+
         var features = [];
         //read in the GeoJSON. This function is asynchronous so
         // anything that needs the json file should be within
@@ -111,44 +111,44 @@ var buildD3Animations = function (map, alts, replaySpeed, doLoop) {
         // Lat/Long they need to be converted to map units
         // with applyLatLngToLayer
         var toLine = d3.svg.line()
-        //.interpolate("linear")
-        .x(function (d) {
-            return applyLatLngToLayer(d).x;
-        })
-        .y(function (d) {
-            return applyLatLngToLayer(d).y;
-        });
+            //.interpolate("linear")
+            .x(function (d) {
+                return applyLatLngToLayer(d).x;
+            })
+            .y(function (d) {
+                return applyLatLngToLayer(d).y;
+            });
 
 
-    // From now on we are essentially appending our features to the
-    // group element. We're adding a class with the line name
-    // and we're making them invisible
+        // From now on we are essentially appending our features to the
+        // group element. We're adding a class with the line name
+        // and we're making them invisible
 
-    // Here we will make the points into a single
-    // line/path. Note that we surround the featuresdata
-    // with [] to tell d3 to treat all the points as a
-    // single line. For now these are basically points
-    // but below we set the "d" attribute using the
-    // line creator function from above.
+        // Here we will make the points into a single
+        // line/path. Note that we surround the featuresdata
+        // with [] to tell d3 to treat all the points as a
+        // single line. For now these are basically points
+        // but below we set the "d" attribute using the
+        // line creator function from above.
         var linePath = g.selectAll('.lineConnect')
-        .data([featuresdata])
-        .enter()
-        .append('path')
-        .attr('id', 'tr' + animId)
-        .attr('class', 'lineConnect')
-        .style({
-            'stroke': 'Blue',
-            'fill': 'none',
-            'stroke-width': '6px'
-        })
-        .style('opacity', '.6');
+            .data([featuresdata])
+            .enter()
+            .append('path')
+            .attr('id', 'tr' + animId)
+            .attr('class', 'lineConnect')
+            .style({
+                'stroke': 'Blue',
+                'fill': 'none',
+                'stroke-width': '6px'
+            })
+            .style('opacity', '.6');
 
         // This will be our traveling circle it will
         // travel along our path
         var marker = g.append('circle')
-        .attr('r', (index == 0) ? 12 : 10)
-        .attr('id', 'marker' + index)
-        .attr('class', 'travelMarker' + index);
+            .attr('r', (index == 0) ? 12 : 10)
+            .attr('id', 'marker' + index)
+            .attr('class', 'travelMarker' + index);
 
         // this puts stuff on the map!
         reset();
@@ -158,42 +158,42 @@ var buildD3Animations = function (map, alts, replaySpeed, doLoop) {
         function reset() {
             // the starting point
             marker.attr('transform',
-            function () {
-                var y = featuresdata[0].geometry.coordinates[1];
-                var x = featuresdata[0].geometry.coordinates[0];
-                return 'translate(' +
-                    map.latLngToLayerPoint(L.latLng(y, x)).x + ',' +
-                    map.latLngToLayerPoint(L.latLng(y, x)).y + ')';
-            });
+                function () {
+                    var y = featuresdata[0].geometry.coordinates[1];
+                    var x = featuresdata[0].geometry.coordinates[0];
+                    return 'translate(' +
+                        map.latLngToLayerPoint(L.latLng(y, x)).x + ',' +
+                        map.latLngToLayerPoint(L.latLng(y, x)).y + ')';
+                });
 
             // linePath.attr("d", d3path);
             linePath.attr('d', toLine);
 
         } // end reset
 
-    // the transition function could have been done above using
-    // chaining but it's cleaner to have a separate function.
-    // the transition. Dash array expects "500, 30" where
-    // 500 is the length of the "dash" 30 is the length of the
-    // gap. So if you had a line that is 500 long and you used
-    // "500, 0" you would have a solid line. If you had "500,500"
-    // you would have a 500px line followed by a 500px gap. This
-    // can be manipulated by starting with a complete gap "0,500"
-    // then a small line "1,500" then bigger line "2,500" and so
-    // on. The values themselves ("0,500", "1,500" etc) are being
-    // fed to the attrTween operator
+        // the transition function could have been done above using
+        // chaining but it's cleaner to have a separate function.
+        // the transition. Dash array expects "500, 30" where
+        // 500 is the length of the "dash" 30 is the length of the
+        // gap. So if you had a line that is 500 long and you used
+        // "500, 0" you would have a solid line. If you had "500,500"
+        // you would have a 500px line followed by a 500px gap. This
+        // can be manipulated by starting with a complete gap "0,500"
+        // then a small line "1,500" then bigger line "2,500" and so
+        // on. The values themselves ("0,500", "1,500" etc) are being
+        // fed to the attrTween operator
         function transition() {
             linePath.transition()
-            .duration(sumTime * 1000 / replaySpeed)
-            .ease('linear')
-            .attrTween('stroke-dasharray', tweenDash)
-            .each('interrupt', function () {
-                d3.select('#' + animId).remove();
-            })
-            .each('end', function () {
-                //              d3.select(this).call(transition);// infinite loop
-                d3.select('#' + animId).remove();
-            });
+                .duration(sumTime * 1000 / replaySpeed)
+                .ease('linear')
+                .attrTween('stroke-dasharray', tweenDash)
+                .each('interrupt', function () {
+                    d3.select('#' + animId).remove();
+                })
+                .each('end', function () {
+                    //              d3.select(this).call(transition);// infinite loop
+                    d3.select('#' + animId).remove();
+                });
         } //end transition
 
         // get the first(!) index where the accTime is greater the searchelement 
@@ -210,7 +210,7 @@ var buildD3Animations = function (map, alts, replaySpeed, doLoop) {
                 if (currentElement < searchElement) {
                     minIndex = currentIndex + 1;
                 } else if (
-                    currentElement >= searchElement && 
+                    currentElement >= searchElement &&
                     (currentIndex > 0 && segments[currentIndex - 1].accTime >= searchElement)) {
                     maxIndex = currentIndex - 1;
                 } else {
@@ -229,13 +229,13 @@ var buildD3Animations = function (map, alts, replaySpeed, doLoop) {
             var xt = (i == 0) ? 0 : route.segments[i - 1].accTime;
             var xd = (i == 0) ? 0 : route.segments[i - 1].accDist;
             var dt = rTime - xt;
-            
+
             var at = route.segments[i].accTime - xt;
             var rt = dt / at;
-            
+
             var ad = route.segments[i].accDist - xd;
             var rd = ad * rt;
-            
+
             return (xd + rd) / sumDist;
 
             // experimental: amplify the speed difference
