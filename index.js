@@ -52,7 +52,7 @@ map.setView([0, 0], 0);
 var replay = function () {
     replaySpeed = $('#replaySpeed option:selected').val();
     doLoop = $('#doLoop').is(':checked');
-    buildD3Animations(responses, replaySpeed, doLoop);
+    buildD3Animations(map, responses, replaySpeed, doLoop);
 };
 
 var getLayers = function (profile) {
