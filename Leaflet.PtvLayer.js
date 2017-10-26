@@ -24,16 +24,125 @@ L.PtvLayer = L.NonTiledLayer.extend({
         L.NonTiledLayer.prototype.initialize.call(this, options);
     },
 
+    _addInteraction: function (resp) {
+        // http://stackoverflow.com/questions/17028830/imageoverlay-and-rectangle-z-index-issue                                                                                        
+        var svgObj = $('.leaflet-overlay-pane svg');
+        svgObj.css('z-index', 9999);
+
+        var tmp = this.lastOpenPopupId;
+        this._poiMarkers.clearLayers();
+        this.lastOpenPopupId = tmp;
+        var that = this;
+
+        for (var l = 0; l < resp.objects.length; l++) {
+            var objects = resp.objects[l].objects;
+
+            var myIcon = L.divIcon({
+                className: 'poi-icon',
+                iconSize: [16, 16],
+                iconAnchor: (this.options.markerIsBalloon) ? [8, 16] : null,
+                popupAnchor: (this.options.markerIsBalloon) ? [0, -8] : null
+            });
+
+            for (var i = 0; i < objects.length; i++) {
+                var tooltip = this._formatTooltip(objects[i].descr);
+                var id = (this._getId) ? this._getId(objects[i]) : null;
+
+                if (objects[i].geometry) {
+                    var lineString = [];
+                    for (var j = 0; j < objects[i].geometry.pixelGeometry.points.length; j++) {
+                        var p = objects[i].geometry.pixelGeometry.points[j];
+                        var g = this._map.containerPointToLatLng([p.x, p.y]);
+                        lineString[j] = [g.lat, g.lng];
+                    }
+    
+                    // create a transparent polyline from an arrays of LatLng points and bind it to the popup
+                    var polyline = L.polyline(lineString, {
+                        color: 'white',
+                        "weight": 20,
+                        opacity: 0.0,
+                        noClip: true
+                    }).bindPopup(tooltip).addTo(this._poiMarkers);
+
+
+                    if (this._getId) {
+                        if ("p" + id === this.lastOpenPopupId)
+                            polyline.openPopup();
+    
+                        polyline.tag = id;
+                        polyline.on('popupopen', function (e) {
+                            that.lastOpenPopupId = "p" + e.target.tag;
+                        });
+                        polyline.on('popupclose', function (e) {
+                            that.lastOpenPopupId = '';
+                        });
+                    }
+                }
+
+                var latlng = this.pixToLatLng(resp.world1, resp.world2, resp.width, resp.height, objects[i].pixel);
+
+                var marker = L.marker(latlng, {
+                    icon: myIcon,
+                    zIndexOffset: i - 1000 // will correct overlapping objects
+                }).bindPopup(tooltip).addTo(this._poiMarkers);
+
+                if (this._getId) {
+                    if ("m" + id === this.lastOpenPopupId)
+                        marker.openPopup();
+    
+                    marker.tag = id;
+                    marker.on('popupopen', function (e) {
+                        that.lastOpenPopupId = "m" + e.target.tag;
+                    });
+                    marker.on('popupclose', function (e) {
+                        that.lastOpenPopupId = '';
+                    });
+                }
+            }
+        }
+    },
+
+    lastOpenPopupId: '',
+    
+    _getId: function (objectInfo) {
+        return objectInfo.descr + objectInfo.ref.point.x + +objectInfo.ref.point.y;
+    },
+
+    _formatTooltip: function (description) {
+        return replaceAll(description, '|', '<br>');
+    },
+    
+    pixToLatLng: function (world1, world2, width, height, point) {
+        var m1 = this.latLngToMercator(world1);
+        var m2 = this.latLngToMercator(world2);
+        var o = L.point(m2.x - m1.x, m2.y - m1.y);
+        var rx = point.x / width;
+        var ry = point.y / height;
+        var mr = L.point(m1.x + rx * o.x, m1.y + ry * o.y);
+
+        return this.mercatorToLatLng(mr);
+    },
+
+    mercatorToLatLng: function (p) {
+        return L.latLng(
+            (360 / Math.PI) * (Math.atan(Math.exp(p.y)) - (Math.PI / 4)),
+            (180.0 / Math.PI) * p.x);
+    },
+
+    latLngToMercator: function (p) {
+        return L.point(
+            p.lng * Math.PI / 180.0,
+            Math.log(Math.tan(Math.PI / 4.0 + p.lat * Math.PI / 360.0)));
+    },
+
     onAdd: function (map) {
         this._poiMarkers = L.featureGroup().addTo(map);
-        this._poiArray = [];
 
         L.NonTiledLayer.prototype.onAdd.call(this, map);
     },
 
     onRemove: function (map) {
         map.removeLayer(this._poiMarkers);
-        this._poiArray = [];
         L.NonTiledLayer.prototype.onRemove.call(this, map);
     },
 
@@ -65,18 +174,6 @@ L.PtvLayer = L.NonTiledLayer.extend({
                 callback(L.Util.emptyImageUrl);
             });
     },
-
-    _formatTooltip: function (description) {
-        return description;
-    },
-
-    _getId: function (objectInfo) {
-        return objectInfo.loId;
-    },
-
-    lastOpenPopupId: '',
-
-    _addInteraction: null,
 
     // runRequest executes a json request on PTV xServer internet, 
     // given the url endpoint, the token and the callbacks to be called
@@ -265,9 +362,7 @@ L.PtvLayer.TruckAttributes = L.PtvLayer.extend({
         request.callerContext.properties[0].value = 'truckattributes';
 
         return request;
-    },
-
-    _getId: null // doesn't provide any IDs
+    }
 });
 
 L.PtvLayer.DataManager = L.PtvLayer.extend({
@@ -595,72 +690,7 @@ L.PtvLayer.FeatureLayerFg = L.PtvLayer.NonTiled.extend({
 
         };
     },
-    type: 'FeatureLayerFg',
-    _addInteraction: function (resp) {
-        // http://stackoverflow.com/questions/17028830/imageoverlay-and-rectangle-z-index-issue                                                                                        
-        var svgObj = $('.leaflet-overlay-pane svg');
-        svgObj.css('z-index', 9999);
-
-        for (var i = 0; i < this._poiArray.length; i++) {
-            this._poiMarkers.removeLayer(this._poiArray[i]);
-        }
-
-        for (var l = 0; l < resp.objects.length; l++) {
-            var objects = resp.objects[l].objects;
-
-            var myIcon = L.divIcon({
-                className: 'poi-icon',
-                iconSize: [16, 16],
-                iconAnchor: (this.options.markerIsBalloon) ? [8, 16] : null,
-                popupAnchor: (this.options.markerIsBalloon) ? [0, -8] : null
-            });
-
-            for (var i = 0; i < objects.length; i++) {
-                var id = resp.objects[l].name + this._getId(objects[i]);
-
-                var tooltip = this._formatTooltip(objects[i].descr);
-                var latlng = this.pixToLatLng(resp.world1, resp.world2, resp.width, resp.height, objects[i].pixel);
-
-                var marker = L.marker(latlng, {
-                    icon: myIcon,
-                    zIndexOffset: i - 1000 // will correct overlapping objects
-                }).bindPopup(tooltip).addTo(this._poiMarkers);
-
-                this._poiArray.push(marker);
-            }
-        }
-    },
-
-    pixToLatLng: function (world1, world2, width, height, point) {
-        var m1 = this.latLngToMercator(world1);
-        var m2 = this.latLngToMercator(world2);
-        var o = L.point(m2.x - m1.x, m2.y - m1.y);
-        var rx = point.x / width;
-        var ry = point.y / height;
-        var mr = L.point(m1.x + rx * o.x, m1.y + ry * o.y);
-
-        return this.mercatorToLatLng(mr);
-    },
-
-    mercatorToLatLng: function (p) {
-        return L.latLng(
-            (360 / Math.PI) * (Math.atan(Math.exp(p.y)) - (Math.PI / 4)),
-            (180.0 / Math.PI) * p.x);
-    },
-
-    latLngToMercator: function (p) {
-        return L.point(
-            p.lng * Math.PI / 180.0,
-            Math.log(Math.tan(Math.PI / 4.0 + p.lat * Math.PI / 360.0)));
-    },
-
-    _getId: function (objectInfo) {
-        return objectInfo.descr + objectInfo.ref.point.x + +objectInfo.ref.point.y;
-    },
-
-    _formatTooltip: function (description) {
-        return replaceAll(description, '|', '<br>');
-    }
+    type: 'FeatureLayerFg'
 });
 
 function escapeRegExp(string) {

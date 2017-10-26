@@ -140,8 +140,8 @@ var buildD3Animations = function (map, alts, replaySpeed, doLoop) {
                 'stroke': 'Blue',
                 'fill': 'none',
                 'stroke-width': '6px'
-            })
-            .style('opacity', '.6');
+            });
+//            .style('opacity', '.6');
 
         // This will be our traveling circle it will
         // travel along our path
