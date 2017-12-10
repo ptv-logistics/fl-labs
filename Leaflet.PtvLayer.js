@@ -59,19 +59,19 @@ L.PtvLayer = L.NonTiledLayer.extend({
                     // create a transparent polyline from an arrays of LatLng points and bind it to the popup
                     var polyline = L.polyline(lineString, {
                         color: 'white',
-                        "weight": 20,
+                        'weight': 20,
                         opacity: 0.0,
                         noClip: true
                     }).bindPopup(tooltip).addTo(this._poiMarkers);
 
 
                     if (this._getId) {
-                        if ("p" + id === this.lastOpenPopupId)
+                        if ('p' + id === this.lastOpenPopupId)
                             polyline.openPopup();
     
                         polyline.tag = id;
                         polyline.on('popupopen', function (e) {
-                            that.lastOpenPopupId = "p" + e.target.tag;
+                            that.lastOpenPopupId = 'p' + e.target.tag;
                         });
                         polyline.on('popupclose', function (e) {
                             that.lastOpenPopupId = '';
@@ -87,12 +87,12 @@ L.PtvLayer = L.NonTiledLayer.extend({
                 }).bindPopup(tooltip).addTo(this._poiMarkers);
 
                 if (this._getId) {
-                    if ("m" + id === this.lastOpenPopupId)
+                    if ('m' + id === this.lastOpenPopupId)
                         marker.openPopup();
     
                     marker.tag = id;
                     marker.on('popupopen', function (e) {
-                        that.lastOpenPopupId = "m" + e.target.tag;
+                        that.lastOpenPopupId = 'm' + e.target.tag;
                     });
                     marker.on('popupclose', function (e) {
                         that.lastOpenPopupId = '';
@@ -449,7 +449,7 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
 
         this._map = map;
 
-        this._resetQueue();
+        this.redraw();
     },
 
     createTile: function (coords, done) {
@@ -474,13 +474,8 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
         */
         tile.setAttribute('role', 'presentation');
 
-        var self = this,
-            map = this._map,
-            crs = map.options.crs,
-            tileSize = this.options.tileSize,
+        var tileSize = this.options.tileSize,
             tileBounds = this._tileCoordsToBounds(coords),
-            nw = tileBounds.getNorthWest(),
-            se = tileBounds.getSouthEast(),
             wbbox = tileBounds;
 
         var mapSection = {
@@ -591,12 +586,12 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
         this.currentRequests = [];
 
         this.activeRequestCount = 0;
-     },
+    },
 
     redraw: function () {
         this._resetQueue();
 
-		L.TileLayer.prototype.redraw.call(this);
+        L.TileLayer.prototype.redraw.call(this);
     },
 
     cnt: 0,
@@ -618,7 +613,7 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
         var that = this;
         var cnt = this.cnt;
 
-        var request = $.ajax({
+        var ajaxReq = $.ajax({
             url: url,
             type: 'POST',
             data: JSON.stringify(request),
@@ -652,7 +647,7 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
             }
         });
 
-        this.currentRequests.push(request);
+        this.currentRequests.push(ajaxReq);
     }
 });
 
@@ -762,9 +757,9 @@ L.PtvLayer.FeatureLayer = L.Layer.extend({
 
     redraw: function (map) {
         map.eachLayer(function (layer) {
-                if (layer.type === 'FeatureLayerBg' || layer.type === 'FeatureLayerFg')
-                    layer.redraw();
-            });
+            if (layer.type === 'FeatureLayerBg' || layer.type === 'FeatureLayerFg')
+                layer.redraw();
+        });
 
         return this;
     },

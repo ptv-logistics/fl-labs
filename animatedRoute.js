@@ -1,33 +1,33 @@
 var buildD3Animations = function (map, alts, replaySpeed, doLoop) {
     // store the map within the closure
-    var map = map;
+    var _map = map;
 
     // already initialized?
-    if (!map.d3Layer) {
+    if (!_map.d3Layer) {
         // create a separate pane for the svg
-        map.createPane('svgPane');
-        map.getPane('svgPane').style.zIndex = 600;
-        map.getPane('svgPane').style.pointerEvents = 'none';
+        _map.createPane('svgPane');
+        _map.getPane('svgPane').style.zIndex = 600;
+        _map.getPane('svgPane').style.pointerEvents = 'none';
 
         var d3Layer = [new Array(3)];
 
         // put the 'slowest' trace on top
         d3Layer[2] = L.svgLayer({
             pointerEvents: 'none',
-            pane: map._panes.svgPane
-        }).addTo(map);
+            pane: _map._panes.svgPane
+        }).addTo(_map);
         d3Layer[0] = L.svgLayer({
             pointerEvents: 'none',
-            pane: map._panes.svgPane
-        }).addTo(map);
+            pane: _map._panes.svgPane
+        }).addTo(_map);
         d3Layer[1] = L.svgLayer({
             pointerEvents: 'none',
-            pane: map._panes.svgPane
-        }).addTo(map);
+            pane: _map._panes.svgPane
+        }).addTo(_map);
 
-        map.d3Layer = d3Layer;
+        _map.d3Layer = d3Layer;
     } else
-        d3Layer = map.d3Layer;
+        d3Layer = _map.d3Layer;
 
     // cancel pending animations
     for (var i = 0; i < 3; i++) {
@@ -35,9 +35,9 @@ var buildD3Animations = function (map, alts, replaySpeed, doLoop) {
         d3.select('#tr' + animId).transition().duration(0);
     }
 
-    if (map.timeOut) {
-        clearTimeout(map.timeOut);
-        map.timeOut = null;
+    if (_map.timeOut) {
+        clearTimeout(_map.timeOut);
+        _map.timeOut = null;
     }
 
     if (doLoop) {
@@ -54,8 +54,8 @@ var buildD3Animations = function (map, alts, replaySpeed, doLoop) {
             maxTime = Math.max(maxTime, t);
         }
 
-        map.timeOut = setTimeout(function () {
-            buildD3Animations(alts, replaySpeed, doLoop);
+        _map.timeOut = setTimeout(function () {
+            buildD3Animations(_map, alts, replaySpeed, doLoop);
         }, maxTime / replaySpeed * 1000);
     }
 
@@ -162,8 +162,8 @@ var buildD3Animations = function (map, alts, replaySpeed, doLoop) {
                     var y = featuresdata[0].geometry.coordinates[1];
                     var x = featuresdata[0].geometry.coordinates[0];
                     return 'translate(' +
-                        map.latLngToLayerPoint(L.latLng(y, x)).x + ',' +
-                        map.latLngToLayerPoint(L.latLng(y, x)).y + ')';
+                    _map.latLngToLayerPoint(L.latLng(y, x)).x + ',' +
+                    _map.latLngToLayerPoint(L.latLng(y, x)).y + ')';
                 });
 
             // linePath.attr("d", d3path);
@@ -235,6 +235,13 @@ var buildD3Animations = function (map, alts, replaySpeed, doLoop) {
 
             var ad = route.segments[i].accDist - xd;
             var rd = ad * rt;
+            
+            for(var j = 0; j < route.stations.length; j++)
+            {
+                if(!route.stations[j].bang && i >= route.stations[j].segmentIdx - 1)
+                    route.stations[j].bang = true;
+            }
+
 
             return (xd + rd) / sumDist;
 
@@ -282,6 +289,9 @@ var buildD3Animations = function (map, alts, replaySpeed, doLoop) {
 
                 //Move the marker to that point
                 marker.attr('transform', 'translate(' + p.x + ',' + p.y + ')'); //move marker
+
+
+
                 //console.log(t + " " + l + " " + interpolate(t))
                 return interpolate(t);
             };
@@ -293,7 +303,7 @@ var buildD3Animations = function (map, alts, replaySpeed, doLoop) {
         function applyLatLngToLayer(d) {
             var y = d.geometry.coordinates[1];
             var x = d.geometry.coordinates[0];
-            return map.latLngToLayerPoint(L.latLng(y, x));
+            return _map.latLngToLayerPoint(L.latLng(y, x));
         }
     }
 };

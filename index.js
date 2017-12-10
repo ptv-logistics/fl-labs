@@ -1,4 +1,4 @@
-if (!token)
+if (!window.token)
     alert('you need an xServer internet token to run this sample!');
 
 var hour = moment('2015-08-17T18:30:00+02:00');
@@ -12,7 +12,7 @@ var itineraryLanguage = 'EN';
 var routingProfile = 'carfast';
 var replaySpeed = 100;
 var responses = null;
-var doLoop = null;
+var doLoop = false;
 var scenario = 'New York';
 
 var map = L.map('map', {
@@ -52,13 +52,13 @@ map.setView([0, 0], 0);
 var replay = function () {
     replaySpeed = $('#replaySpeed option:selected').val();
     doLoop = $('#doLoop').is(':checked');
-    buildD3Animations(map, responses, replaySpeed, doLoop);
+    window.buildD3Animations(map, responses, replaySpeed, doLoop);
 };
 
 var getLayers = function (profile) {
     //add tile layer
     var bgLayer = new L.PtvLayer.FeatureLayerBg('https://api-eu-test.cloud.ptvgroup.com', {
-        token: token,
+        token: window.token,
         attribution: attribution,
         profile: profile + '-bg',
         beforeSend2: function (request) {
@@ -72,7 +72,7 @@ var getLayers = function (profile) {
 
     //add fg layer
     var fgLayer = new L.PtvLayer.FeatureLayerFg('https://api-eu-test.cloud.ptvgroup.com', {
-        token: token,
+        token: window.token,
         attribution: attribution,
         profile: profile + '-fg',
         pane: 'labels',
@@ -143,7 +143,7 @@ $('#scenarioSelect').val(scenario);
 var sidebar = L.control.sidebar('sidebar').addTo(map);
 sidebar.open('home');
 
-fixClickPropagationForIE(sidebar._sidebar);
+window.fixClickPropagationForIE(sidebar._sidebar);
 
 var buildProfile = function () {
     var template = '<Profile xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><FeatureLayer majorVersion=\"1\" minorVersion=\"0\"><GlobalSettings enableTimeDependency=\"true\"/><Themes><Theme id=\"PTV_RestrictionZones\" enabled=\"{enableRestrictionZones}\" priorityLevel=\"0\"></Theme><Theme id=\"PTV_SpeedPatterns\" enabled=\"{enableSpeedPatterns}\" priorityLevel=\"0\"/><Theme id=\"PTV_TrafficIncidents\" enabled=\"{enableTrafficIncidents}\" priorityLevel=\"0\"/><Theme id=\"PTV_TruckAttributes\" enabled=\"{enableTruckAttributes}\" priorityLevel=\"0\"/><Theme id=\"PTV_TimeZones\" enabled=\"true\" priorityLevel=\"0\"/></Themes></FeatureLayer><Routing majorVersion=\"2\" minorVersion=\"0\"><Course><AdditionalDataRules enabled=\"true\"/></Course></Routing></Profile>';
@@ -210,12 +210,14 @@ var updateParams = function (refreshFeatureLayer, setTimeNow) {
 var routingControl = L.Routing.control({
     plan: L.Routing.plan([], {
         createMarker: function (i, wp) {
-            return L.marker(wp.latLng, {
+            var m=  L.marker(wp.latLng, {              
                 draggable: true,
                 icon: L.icon.glyph({
                     glyph: String.fromCharCode(65 + i)
                 })
             });
+            m.id = 'wpmarker' + i;
+            return m;
         },
         geocoder: L.Control.Geocoder.ptv({
             serviceUrl: 'https://api-eu-test.cloud.ptvgroup.com/xlocate/rs/XLocate/',
@@ -244,7 +246,7 @@ var routingControl = L.Routing.control({
     showAlternatives: true,
     router: L.Routing.ptv({
         serviceUrl: 'https://api-eu-test.cloud.ptvgroup.com/xroute/rs/XRoute/',
-        token: token,
+        token: window.token,
         numberOfAlternatives: ((dynamicTimeOnStaticRoute) ? 1 : 0) + ((staticTimeOnStaticRoute) ? 1 : 0),
         beforeSend: function (request, currentResponses, idx) {
             if (hour)
