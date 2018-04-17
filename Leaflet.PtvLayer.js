@@ -8,18 +8,31 @@ L.PtvLayer = L.NonTiledLayer.extend({
         markerIsBalloon: false
     },
 
+    _update: function () {
+        var tmp = this.lastOpenPopupId;
+        this._poiMarkers.clearLayers();
+        this.lastOpenPopupId = tmp;
+
+        L.NonTiledLayer.prototype._update.call(this);
+    },
+
     initialize: function (url, options) { // (String, Object)
         this._url = url;
         var xMapParams = L.extend({}, this.defaultXMapParams);
 
         for (var i in options) {
-            // all keys that are not NonTiledLayer options go to xMap params
-            if (!this.options.hasOwnProperty(i)) {
+            // all keys that are not PtvLayerTiledLayer options go to xMap params
+			if (!L.NonTiledLayer.prototype.options.hasOwnProperty(i) && 
+            !(L.Layer && L.Layer.prototype.options.hasOwnProperty(i))) {
                 xMapParams[i] = options[i];
             }
         }
 
         this.xMapParams = xMapParams;
+
+        // set max bounds xMapServer can handle
+        if(!options.bounds)
+            options.bounds = L.latLngBounds([-66.50, -180], [85.05, 180]);
 
         L.NonTiledLayer.prototype.initialize.call(this, options);
     },
@@ -29,9 +42,6 @@ L.PtvLayer = L.NonTiledLayer.extend({
         var svgObj = $('.leaflet-overlay-pane svg');
         svgObj.css('z-index', 9999);
 
-        var tmp = this.lastOpenPopupId;
-        this._poiMarkers.clearLayers();
-        this.lastOpenPopupId = tmp;
         var that = this;
 
         for (var l = 0; l < resp.objects.length; l++) {
@@ -39,14 +49,15 @@ L.PtvLayer = L.NonTiledLayer.extend({
 
             var myIcon = L.divIcon({
                 className: 'poi-icon',
+                backgroud: '#000',
                 iconSize: [16, 16],
-                iconAnchor: (this.options.markerIsBalloon) ? [8, 16] : null,
-                popupAnchor: (this.options.markerIsBalloon) ? [0, -8] : null
+                iconAnchor: this.options.markerIsBalloon? [8, 16] : [8,8],
+                popupAnchor: this.options.markerIsBalloon? [0, -8] : [0, 0]
             });
 
             for (var i = 0; i < objects.length; i++) {
                 var tooltip = this._formatTooltip(objects[i].descr);
-                var id = (this._getId) ? this._getId(objects[i]) : null;
+                var id = this._getId? this._getId(objects[i]) : null;
 
                 if (objects[i].geometry) {
                     var lineString = [];
@@ -105,7 +116,7 @@ L.PtvLayer = L.NonTiledLayer.extend({
     lastOpenPopupId: '',
     
     _getId: function (objectInfo) {
-        return objectInfo.descr + objectInfo.ref.point.x + +objectInfo.ref.point.y;
+        return objectInfo.descr + objectInfo.ref.point.x + objectInfo.ref.point.y;
     },
 
     _formatTooltip: function (description) {
@@ -125,8 +136,8 @@ L.PtvLayer = L.NonTiledLayer.extend({
 
     mercatorToLatLng: function (p) {
         return L.latLng(
-            (360 / Math.PI) * (Math.atan(Math.exp(p.y)) - (Math.PI / 4)),
-            (180.0 / Math.PI) * p.x);
+            360 / Math.PI * (Math.atan(Math.exp(p.y)) - Math.PI / 4),
+            180.0 / Math.PI * p.x);
     },
 
     latLngToMercator: function (p) {
@@ -185,10 +196,13 @@ L.PtvLayer = L.NonTiledLayer.extend({
             type: 'POST',
             data: JSON.stringify(request),
 
-            headers: {
-                'Authorization': 'Basic ' + btoa('xtok:' + token),
-                'Content-Type': 'application/json'
-            },
+            headers: function () {
+                var h = {
+                    'Content-Type': 'application/json'
+                };
+                if (token) h['Authorization'] = 'Basic ' + btoa('xtok:' + token);
+                return h;
+            }(),
 
             success: function (data, status, xhr) {
                 handleSuccess(data);
@@ -254,7 +268,7 @@ L.PtvLayer = L.NonTiledLayer.extend({
             }
         };
         return request;
-    },
+    }
 });
 
 L.PtvLayer.NonTiled = L.PtvLayer.extend({
@@ -274,7 +288,7 @@ L.PtvLayer.NonTiled = L.PtvLayer.extend({
         }
 
         return request;
-    },
+    }
 });
 
 
@@ -289,11 +303,12 @@ L.PtvLayer.POI = L.PtvLayer.extend({
 
     getRequest: function (world1, world2, width, height) {
         var request = L.PtvLayer.prototype.getRequest.call(this, world1, world2, width, height);
+        
         request.layers = [{
             '$type': 'SMOLayer',
-            'name': 'default.points-of-interest',
+            'name': 'default.points-of-interest' + (this.options.filter? ';' + this.options.filter : ''),
             'visible': true,
-            'objectInfos': 'FULLGEOMETRY'
+            'objectInfos': 'REFERENCEPOINT'
         }];
 
         return request;
@@ -305,6 +320,7 @@ L.PtvLayer.POI = L.PtvLayer.extend({
         return fields[1];
     }
 });
+
 
 L.PtvLayer.TrafficInformation = L.PtvLayer.extend({
     initialize: function (url, options) { // (String, Object)
@@ -333,6 +349,45 @@ L.PtvLayer.TrafficInformation = L.PtvLayer.extend({
         return fields[1];
     }
 });
+
+// A TrafficInformation layer which uses the map&guide-internet configuration
+L.PtvLayer.TrafficInformation.Mgi = L.PtvLayer.TrafficInformation.extend({
+    initialize: function (url, options) { // (String, Object)
+        if (options.minZoom === undefined)
+            options.minZoom = 10;
+        options.maxZoom = 19;
+
+        L.PtvLayer.prototype.initialize.call(this, url, options);
+    },
+
+    getRequest: function (world1, world2, width, height) {
+        var request = L.PtvLayer.prototype.getRequest.call(this, world1, world2, width, height);
+        request.layers = [{
+            '$type': 'SMOLayer',
+            'name': 'traffic.ptv-traffic.mgi',
+            'visible': true,
+            'objectInfos': 'FULLGEOMETRY'
+        }];
+
+        return request;
+    },
+
+    _formatTooltip: function (description) {
+        // fields for mgi-traffic
+        // "TEXT", "TEXT_EN", "TEXT_FR", "TEXT_NL", "TEXT_IT", "CATEGORY", "VALIDUNTIL", "ROAD"
+
+        var fields = description.split('#')[1].split('!!!xxx;;;');
+
+        // 'EN' is the default language
+        var language = this.options.language? this.options.language.toUpperCase() : 'EN';
+
+        // the supported languages
+        var languages = ['DE', 'EN', 'FR', 'NL', 'IT'];
+
+        return fields[languages.indexOf(language)];
+    }
+});
+
 
 L.PtvLayer.TruckAttributes = L.PtvLayer.extend({
     initialize: function (url, options) { // (String, Object)
@@ -420,10 +475,7 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
         beforeSend: null,
         errorTileUrl: 'tile-error.png',
         noWrap: true,
-        bounds: new L.LatLngBounds([
-            [85.0, -178.965000],
-            [-66.5, 178.965000]
-        ]),
+        bounds: L.latLngBounds([-66.50, -180], [85.05, 180]),
         minZoom: 0,
         maxZoom: 19,
         token: ''
@@ -618,14 +670,17 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
             type: 'POST',
             data: JSON.stringify(request),
 
-            headers: {
-                'Authorization': 'Basic ' + btoa('xtok:' + token),
-                'Content-Type': 'application/json'
-            },
+            headers: function () {
+                var h = {
+                    'Content-Type': 'application/json'
+                };
+                if (token) h['Authorization'] = 'Basic ' + btoa('xtok:' + token);
+                return h;
+            }(),
 
             success: function (data, status, xhr) {
                 that.currentRequests.splice(that.currentRequests.indexOf(request), 1);
-                if (that.cnt == cnt && that.requestQueue.length) {
+                if (that.cnt === cnt && that.requestQueue.length) {
                     var pendingRequest = that.requestQueue.shift();
                     that.runRequestQ(pendingRequest.url, pendingRequest.request, pendingRequest.token, pendingRequest.handleSuccess, pendingRequest.handleError, true);
                 } else {
@@ -636,7 +691,7 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
 
             error: function (xhr, status, error) {
                 that.currentRequests.splice(that.currentRequests.indexOf(request), 1);
-                if (that.cnt == cnt && that.requestQueue.length) {
+                if (that.cnt === cnt && that.requestQueue.length) {
                     var pendingRequest = that.requestQueue.shift();
                     that.runRequestQ(pendingRequest.url, pendingRequest.request, pendingRequest.token, pendingRequest.handleSuccess, pendingRequest.handleError, true);
                 } else {

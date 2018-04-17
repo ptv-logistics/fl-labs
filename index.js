@@ -171,8 +171,8 @@ var updateScenario = function () {
         ]);
     else if (scenario === 'Paris')
         routingControl.setWaypoints([
-            L.latLng(y = 48.92233, 2.32382),
-            L.latLng(y = 48.80220, 2.44454)
+            L.latLng(48.92233, 2.32382),
+            L.latLng(48.80220, 2.44454)
         ]);
     else if (scenario === 'Karlsruhe')
         routingControl.setWaypoints([
@@ -221,7 +221,7 @@ var routingControl = L.Routing.control({
         },
         geocoder: L.Control.Geocoder.ptv({
             serviceUrl: 'https://api-eu-test.cloud.ptvgroup.com/xlocate/rs/XLocate/',
-            token: token
+            token: window.token
         }),
         reverseWaypoints: true
     }),
