@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <title>Feature Layer Labs</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.7/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.8/dist/leaflet-routing-machine.css" />
     <link rel="stylesheet" href="https://unpkg.com/sidebar-v2@0.4.0/css/leaflet-sidebar.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-contextmenu@1.4.0/dist/leaflet.contextmenu.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
@@ -107,10 +107,10 @@
                     </p>
                     <div style="margin: 10px 0px 10px 0px;">
                         <div>Consider layers for routing:</div>
-                        <div><input type="checkbox" id="enableTrafficIncidents" onchange="updateParams(false, true)">Traffic Incidents</div>
-                        <div><input type="checkbox" id="enableSpeedPatterns" onchange="updateParams(false)">Speed Patterns</div>
-                        <div><input type="checkbox" id="enableTruckAttributes" onchange="updateParams(false)">Truck Attributes</div>
-                        <div><input type="checkbox" id="enableRestrictionZones" onchange="updateParams(false)">Restriction Zones</div>
+                        <div><input type="checkbox" id="enableTrafficIncidents" onchange="updateParams()">Traffic Incidents</div>
+                        <div><input type="checkbox" id="enableSpeedPatterns" onchange="updateParams()">Speed Patterns</div>
+                        <div><input type="checkbox" id="enableTruckAttributes" onchange="updateParams()">Truck Attributes</div>
+                        <div><input type="checkbox" id="enableRestrictionZones" onchange="updateParams()">Restriction Zones</div>
                     </div>
                     <div style="margin: 10px 0px 10px 0px;">
                         <div>Select time of day</div>
@@ -221,7 +221,7 @@
     <script src="https://unpkg.com/jquery@3.2.1/dist/jquery.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.nontiledlayer@1.0.7/dist/NonTiledLayer.js"></script>
-    <script src="https://unpkg.com/leaflet-routing-machine@3.2.7/dist/leaflet-routing-machine.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.8/dist/leaflet-routing-machine.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder@1.5.8/dist/Control.Geocoder.js"></script>
     <script src="https://unpkg.com/sidebar-v2@0.4.0/js/leaflet-sidebar.min.js"></script>
     <script src="https://unpkg.com/leaflet-contextmenu@1.4.0/dist/leaflet.contextmenu.min.js"></script>

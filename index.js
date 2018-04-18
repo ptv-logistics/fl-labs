@@ -1,15 +1,16 @@
 if (!window.token)
     alert('you need an xServer internet token to run this sample!');
 
-var hour = moment('2015-08-17T18:30:00+02:00');
+//    var hour = moment('2015-08-17T18:30:00+02:00');
+var hour = moment();
 var enableSpeedPatterns = true;
 var enableRestrictionZones = false;
-var enableTrafficIncidents = false;
+var enableTrafficIncidents = true;
 var enableTruckAttributes = false;
 var dynamicTimeOnStaticRoute = true;
 var staticTimeOnStaticRoute = true;
 var itineraryLanguage = 'EN';
-var routingProfile = 'carfast';
+var routingProfile = 'truckfast';
 var replaySpeed = 100;
 var responses = null;
 var doLoop = false;
@@ -80,7 +81,7 @@ var getLayers = function (profile) {
             request.mapParams.referenceTime = hour.format();
 
             // include time domain for incidents
-            if (incidents.visible)
+            if (incidentsLayer.visible)
                 request.callerContext.properties.push({
                     'key': 'ProfileXMLSnippet',
                     'value': '<Profile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><FeatureLayer majorVersion="1" minorVersion="0"><GlobalSettings enableTimeDependency="true"/><Themes><Theme id="PTV_TrafficIncidents" enabled="true"><FeatureDescription includeTimeDomain="true" /></Theme></Themes></FeatureLayer></Profile>'
@@ -92,16 +93,16 @@ var getLayers = function (profile) {
     return L.layerGroup([bgLayer, fgLayer]);
 };
 
-var incidents = new L.PtvLayer.FeatureLayer({
+var incidentsLayer = new L.PtvLayer.FeatureLayer({
     name: 'PTV_TrafficIncidents'
 }).addTo(map);
-var speedPatterns = new L.PtvLayer.FeatureLayer({
+var speedPatternsLayer = new L.PtvLayer.FeatureLayer({
     name: 'PTV_SpeedPatterns'
 }).addTo(map);
-var restrictionZones = new L.PtvLayer.FeatureLayer({
+var restrictionZonesLayer = new L.PtvLayer.FeatureLayer({
     name: 'PTV_RestrictionZones'
-}).addTo(map);
-var truckAttributes = new L.PtvLayer.FeatureLayer({
+}); // .addTo(map);
+var truckAttributesLayer = new L.PtvLayer.FeatureLayer({
     name: 'PTV_TruckAttributes'
 }); //.addTo(map);
 //var preferredRoutes = new L.PtvLayer.FeatureLayer({ name: 'PTV_PreferredRoutes' }).addTo(map);
@@ -114,10 +115,10 @@ var baseLayers = {
 };
 
 L.control.layers(baseLayers, {
-    'Incidents': incidents,
-    'Truck Attributes': truckAttributes,
-    'Restriction Zones': restrictionZones,
-    'Speed Patterns': speedPatterns
+    'Incidents': incidentsLayer,
+    'Speed Patterns': speedPatternsLayer,
+    'Truck Attributes': truckAttributesLayer,
+    'Restriction Zones': restrictionZonesLayer
 }, {
     position: 'topleft'
 }).addTo(map);
@@ -125,6 +126,59 @@ L.control.layers(baseLayers, {
 new L.Control.Zoom({
     position: 'bottomleft'
 }).addTo(map);
+
+var indSelf = false;
+
+var _onLayerAdd = function (e) {
+    //	return; // only one-way sync
+
+    if (indSelf) // event was triggered by panel
+        return;
+
+    if (e.layer === truckAttributesLayer) {
+        enableTruckAttributes = true;
+        $('#enableTruckAttributes').prop('checked', enableTruckAttributes);
+    } else if (e.layer === incidentsLayer) {
+        enableTrafficIncidents = true;
+        $('#enableTrafficIncidents').prop('checked', enableTrafficIncidents);
+    } else if (e.layer === speedPatternsLayer) {
+        enableSpeedPatterns = true;
+        $('#enableSpeedPatterns').prop('checked', enableSpeedPatterns);
+    } else if (e.layer === restrictionZonesLayer) {
+        enableRestrictionZones = true;
+        $('#enableRestrictionZones').prop('checked', enableRestrictionZones);
+    } else return;
+
+    if (routingControl)
+        routingControl.route();
+};
+
+var _onLayerRemove = function (e) {
+    //	return; // only one-way sync
+
+    if (indSelf) // event was triggered by panel
+        return;
+
+    if (e.layer === truckAttributesLayer) {
+        enableTruckAttributes = false;
+        $('#enableTruckAttributes').prop('checked', enableTruckAttributes);
+    } else if (e.layer === incidentsLayer) {
+        enableTrafficIncidents = false;
+        $('#enableTrafficIncidents').prop('checked', enableTrafficIncidents);
+    } else if (e.layer === speedPatternsLayer) {
+        enableSpeedPatterns = false;
+        $('#enableSpeedPatterns').prop('checked', enableSpeedPatterns);
+    } else if (e.layer === restrictionZonesLayer) {
+        enableRestrictionZones = false;
+        $('#enableRestrictionZones').prop('checked', enableRestrictionZones);
+    } else return;
+
+    if (routingControl)
+        routingControl.route();
+};
+
+map.on('layeradd', _onLayerAdd, this);
+map.on('layerremove', _onLayerRemove, this);
 
 // update ui
 $('#range').attr('value', hour.format());
@@ -183,12 +237,8 @@ var updateScenario = function () {
     routingControl.route();
 };
 
-var updateParams = function (refreshFeatureLayer, setTimeNow) {
-    if (setTimeNow)
-        $('#range').val(moment().format());
-
+var updateParams = function (refreshFeatureLayer) {
     hour = moment($('#range').val());
-
     enableSpeedPatterns = $('#enableSpeedPatterns').is(':checked');
     enableRestrictionZones = $('#enableRestrictionZones').is(':checked');
     enableTruckAttributes = $('#enableTruckAttributes').is(':checked');
@@ -198,8 +248,33 @@ var updateParams = function (refreshFeatureLayer, setTimeNow) {
     itineraryLanguage = $('#languageSelect option:selected').val();
     routingProfile = $('#routingProfile option:selected').val();
 
-    if (refreshFeatureLayer || setTimeNow) {
-        speedPatterns.redraw(map);
+    // sync panel->layers
+    indSelf = true;
+
+    if (enableTruckAttributes)
+        map.addLayer(truckAttributesLayer);
+    else
+        map.removeLayer(truckAttributesLayer);
+
+    if (enableTrafficIncidents)
+        map.addLayer(incidentsLayer);
+    else
+        map.removeLayer(incidentsLayer);
+
+    if (enableSpeedPatterns)
+        map.addLayer(speedPatternsLayer);
+    else
+        map.removeLayer(speedPatternsLayer);
+
+    if (enableRestrictionZones)
+        map.addLayer(restrictionZonesLayer);
+    else
+        map.removeLayer(restrictionZonesLayer);
+
+    indSelf = false;
+
+    if (refreshFeatureLayer) {
+        incidentsLayer.redraw(map);
 
     }
 
@@ -210,7 +285,7 @@ var updateParams = function (refreshFeatureLayer, setTimeNow) {
 var routingControl = L.Routing.control({
     plan: L.Routing.plan([], {
         createMarker: function (i, wp) {
-            var m=  L.marker(wp.latLng, {              
+            var m = L.marker(wp.latLng, {
                 draggable: true,
                 icon: L.icon.glyph({
                     glyph: String.fromCharCode(65 + i)
@@ -230,18 +305,15 @@ var routingControl = L.Routing.control({
             color: 'black',
             opacity: 0.15,
             weight: 9
-        },
-        {
+        }, {
             color: 'white',
             opacity: 0.8,
             weight: 6
-        },
-        {
+        }, {
             color: 'blue',
             opacity: 0.5,
             weight: 2
-        }
-        ],
+        }],
     },
     showAlternatives: true,
     router: L.Routing.ptv({
@@ -300,7 +372,7 @@ var routingControl = L.Routing.control({
         roundingSensitivity: 1000
     }),
     routeWhileDragging: false,
-    routeDragInterval: 1000,    
+    routeDragInterval: 1000,
     collapsible: true
 }).addTo(map);
 
