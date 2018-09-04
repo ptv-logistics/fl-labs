@@ -25,6 +25,19 @@ L.Control.Geocoder.Ptv = L.Class.extend({
     },
 
     geocode: function (query, cb, context) {
+        var coord = query.match(new RegExp("^\\s*([-+]?\\d*\\.?\\d*)\\s*,\\s*([-+]?\\d*\\.?\\d*)\\s*$"));
+        if(coord) {
+            var loc = L.latLng(coord[1],coord[2]);
+            
+            cb.call(context, [{
+                name: query,
+                center: loc,
+                bbox: L.latLngBounds(loc, loc)
+            }]);
+
+            return;
+        }
+
         var that = this;
         var url = this.options.serviceUrl + 'findAddressByText';
         // sample PTV xLocate request
@@ -38,12 +51,10 @@ L.Control.Geocoder.Ptv = L.Class.extend({
                 'properties': [{
                     'key': 'CoordFormat',
                     'value': 'OG_GEODECIMAL'
-                },
-                {
+                }, {
                     'key': 'Profile',
                     'value': 'default'
-                }
-                ]
+                }]
             }
         };
 
