@@ -120,7 +120,49 @@ L.PtvLayer = L.NonTiledLayer.extend({
     },
 
     _formatTooltip: function (description) {
-        return replaceAll(description, '|', '<br>');
+        var toolTip = '';
+        var attributes = description.split('|');
+        for(var i = 0; i < attributes.length; i++)
+        {
+            // add linebreak for multiline
+            if(toolTip.length > 0)
+                toolTip = toolTip + '<br>';
+
+            // get attirbute name and value
+            var keyval = attributes[i].split('=');
+
+            // could filter attributes to display here
+            // if(tootipAttributes.includes(keyval[0])
+            
+            var attributeName = keyval[0];
+            var attributeValue = keyval[1];
+            switch(attributeName)
+            {
+            case 'length': // TI traffic jam length
+                attributeValue = this.options.imperial
+                ? new Intl.NumberFormat().format(keyval[1] / 1000 / 1.609344) + ' mi'
+                : new Intl.NumberFormat().format(keyval[1] / 1000) + ' km';
+                break;
+            case 'maxWeight': //TA weight
+            case 'maxAxleLoad': //TA weight
+                attributeValue = this.options.imperial
+                ? new Intl.NumberFormat().format(Math.round(keyval[1] / 45.3592) * 100)  + ' lb'
+                : new Intl.NumberFormat().format(keyval[1]) + ' kg';
+                break;
+            case 'maxHeight': //TA length
+            case 'maxWidth': //TA length
+            case 'maxLength': //TA length
+                attributeValue = this.options.imperial
+                ? Intl.NumberFormat().format(Math.round(keyval[1] / 2.54)) + ' in'
+                : Intl.NumberFormat().format(keyval[1]) + ' m';
+            break;
+            }
+
+            // build the tooltip line, could also localize field name here
+            toolTip = toolTip + attributeName + ': ' + attributeValue; 
+        }
+
+        return toolTip;
     },
     
     pixToLatLng: function (world1, world2, width, height, point) {
@@ -714,14 +756,13 @@ L.PtvLayer.FeatureLayerFg = L.PtvLayer.NonTiled.extend({
     initialize: function (url, options) { // (String, Object)
         L.PtvLayer.NonTiled.prototype.initialize.call(this, url, options);
 
-        var that = this;
-        this.options.beforeSend = function (request) {
+        this.options.beforeSend = L.bind(function (request) {
             request.callerContext.properties[0] = {
                 key: 'Profile',
                 value: options.profile
             };
 
-            that._map.eachLayer(function (layer) {
+            this._map.eachLayer(function (layer) {
                 if (layer.type === 'FeatureLayer' && layer.visible)
                     request.layers.push({
                         '$type': 'FeatureLayer',
@@ -732,13 +773,13 @@ L.PtvLayer.FeatureLayerFg = L.PtvLayer.NonTiled.extend({
             });
 
 
-            if (typeof that.options.beforeSend2 === 'function') {
-                that.options.beforeSend2(request);
+            if (typeof this.options.beforeSend2 === 'function') {
+                this.options.beforeSend2(request);
             }
 
             return request;
 
-        };
+        }, this);
     },
     type: 'FeatureLayerFg'
 });
@@ -755,14 +796,13 @@ L.PtvLayer.FeatureLayerBg = L.PtvLayer.Tiled.extend({
     initialize: function (url, options) { // (String, Object)
         L.PtvLayer.Tiled.prototype.initialize.call(this, url, options);
 
-        var that = this;
-        this.options.beforeSend = function (request) {
+        this.options.beforeSend = L.bind(function (request) {
             request.callerContext.properties[0] = {
                 key: 'Profile',
                 value: options.profile
             };
 
-            that._map.eachLayer(function (layer) {
+            this._map.eachLayer(function (layer) {
                 if (layer.type === 'FeatureLayer' && layer.visible)
                     request.layers.push({
                         '$type': 'FeatureLayer',
@@ -771,12 +811,12 @@ L.PtvLayer.FeatureLayerBg = L.PtvLayer.Tiled.extend({
                     });
             });
 
-            if (typeof that.options.beforeSend2 === 'function') {
-                that.options.beforeSend2(request);
+            if (typeof this.options.beforeSend2 === 'function') {
+                this.options.beforeSend2(request);
             }
 
             return request;
-        };
+        }, this);
     },
     type: 'FeatureLayerBg'
 });
@@ -804,10 +844,9 @@ L.PtvLayer.FeatureLayer = L.Layer.extend({
 
     onRemove: function (map) {
         this.visible = false;
-        var that = this;
-        setTimeout(function () {
-            that.redraw(map);
-        }, 0);
+        setTimeout(L.bind(function () {
+            this.redraw(map);
+        }, 0), this);
     },
 
     redraw: function (map) {

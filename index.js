@@ -15,6 +15,7 @@ var replaySpeed = 100;
 var responses = null;
 var doLoop = false;
 var scenario = 'New York';
+var useImperial = false;
 
 var map = L.map('map', {
     minZoom: 6,
@@ -77,16 +78,15 @@ var getLayers = function (profile) {
         attribution: attribution,
         profile: profile + '-fg',
         pane: 'labels',
+        imperial: useImperial,
         beforeSend2: function (request) {
             request.mapParams.referenceTime = hour.format();
-
             // include time domain for incidents
             if (incidentsLayer.visible)
                 request.callerContext.properties.push({
                     'key': 'ProfileXMLSnippet',
                     'value': '<Profile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><FeatureLayer majorVersion="1" minorVersion="0"><GlobalSettings enableTimeDependency="true"/><Themes><Theme id="PTV_TrafficIncidents" enabled="true"><FeatureDescription includeTimeDomain="true" /></Theme></Themes></FeatureLayer></Profile>'
                 });
-
         }
     });
 
@@ -187,6 +187,7 @@ $('#enableRestrictionZones').attr('checked', enableRestrictionZones);
 $('#enableTrafficIncidents').attr('checked', enableTrafficIncidents);
 $('#enableTruckAttributes').attr('checked', enableTruckAttributes);
 $('#dynamicTimeOnStaticRoute').attr('checked', dynamicTimeOnStaticRoute);
+$('#useImperial').attr('checked', useImperial);
 $('#staticTimeOnStaticRoute').attr('checked', staticTimeOnStaticRoute);
 $('#languageSelect').val(itineraryLanguage);
 $('#routingProfile').val(routingProfile);
@@ -196,8 +197,6 @@ $('#scenarioSelect').val(scenario);
 
 var sidebar = L.control.sidebar('sidebar').addTo(map);
 sidebar.open('home');
-
-window.fixClickPropagationForIE(sidebar._sidebar);
 
 var buildProfile = function () {
     var template = '<Profile xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><FeatureLayer majorVersion=\"1\" minorVersion=\"0\"><GlobalSettings enableTimeDependency=\"true\"/><Themes><Theme id=\"PTV_RestrictionZones\" enabled=\"{enableRestrictionZones}\" priorityLevel=\"0\"></Theme><Theme id=\"PTV_SpeedPatterns\" enabled=\"{enableSpeedPatterns}\" priorityLevel=\"0\"/><Theme id=\"PTV_TrafficIncidents\" enabled=\"{enableTrafficIncidents}\" priorityLevel=\"0\"/><Theme id=\"PTV_TruckAttributes\" enabled=\"{enableTruckAttributes}\" priorityLevel=\"0\"/><Theme id=\"PTV_TimeZones\" enabled=\"true\" priorityLevel=\"0\"/></Themes></FeatureLayer><Routing majorVersion=\"2\" minorVersion=\"0\"><Course><AdditionalDataRules enabled=\"true\"/></Course></Routing></Profile>';
@@ -246,6 +245,7 @@ var updateParams = function (refreshFeatureLayer) {
     dynamicTimeOnStaticRoute = $('#dynamicTimeOnStaticRoute').is(':checked');
     staticTimeOnStaticRoute = $('#staticTimeOnStaticRoute').is(':checked');
     itineraryLanguage = $('#languageSelect option:selected').val();
+    useImperial = $('#useImperial').is(':checked');
     routingProfile = $('#routingProfile option:selected').val();
 
     // sync panel->layers
@@ -274,12 +274,19 @@ var updateParams = function (refreshFeatureLayer) {
     indSelf = false;
 
     if (refreshFeatureLayer) {
-        incidentsLayer.redraw(map);
-
+        map.eachLayer(function(layer){
+            if(layer.options.profile)
+            {
+                layer.options.imperial = useImperial;
+                layer.redraw(map);
+            }
+        });
     }
 
     routingControl._router.options.numberOfAlternatives = ((dynamicTimeOnStaticRoute) ? 1 : 0) + ((staticTimeOnStaticRoute) ? 1 : 0);
+    routingControl._formatter.options.units = useImperial? 'imperial' : 'metric';
     routingControl.route();
+
 };
 
 var routingControl = L.Routing.control({
@@ -369,7 +376,8 @@ var routingControl = L.Routing.control({
         }
     }),
     formatter: new L.Routing.Formatter({
-        roundingSensitivity: 1000
+//        roundingSensitivity: 1,
+        units: useImperial? 'imperial' : 'metric'
     }),
     routeWhileDragging: false,
     routeDragInterval: 1000,

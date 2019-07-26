@@ -25,17 +25,3 @@ var runRequest = function (url, request, token, handleSuccess, handleError) {
         }
     });
 };
-
-var fixClickPropagationForIE = function (container) {
-    container.onclick = L.DomEvent.stopPropagation;
-    var inputTags = container.getElementsByTagName('input');
-    var selectTags = container.getElementsByTagName('select');
-    var elements = Array.prototype.slice.call(inputTags, 0);
-    elements = elements.concat(Array.prototype.slice.call(selectTags, 0));
-
-    for (var i = 0; i < elements.length; i++) {
-        if (elements[i].type == 'text')
-            elements[i].onclick = L.DomEvent.stopPropagation;
-        elements[i].onmousedown = elements[i].ondblclick = elements[i].onpointerdown = L.DomEvent.stopPropagation;
-    }
-};
