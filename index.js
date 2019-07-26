@@ -380,12 +380,32 @@ var routingControl = L.Routing.control({
         units: useImperial? 'imperial' : 'metric'
     }),
     routeWhileDragging: false,
-    routeDragInterval: 1000,
+    routeDragInterval:  1000,
     collapsible: true
 }).addTo(map);
 
 routingControl.on('routingerror', function (e) {
+    responses = [];
+    replay();
     alert(e.error.responseJSON.errorMessage);
 });
 
 updateScenario();
+
+var merctoLatLng = function (x ,y) {
+    return L.latLng(
+        (360 / Math.PI) * (Math.atan(Math.exp(y / 6371000.0)) - (Math.PI / 4)),
+        (180.0 / Math.PI) * (x / 6371000.0));    
+};
+
+var parseRequest = function () {
+    var x = document.getElementById('RequestInput').value;
+    var r = JSON.parse(x);
+    var wp = r.waypoints
+        .map(function (d) {
+            return L.latLng(d.coords[0].point.y, d.coords[0].point.x);
+//            return merctoLatLng(d.coords[0].point.x, d.coords[0].point.y);
+        });
+
+    routingControl.setWaypoints(wp);
+};

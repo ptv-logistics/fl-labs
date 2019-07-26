@@ -105,6 +105,12 @@
                             <option>Karlsruhe</option>
                         </select>
                     </p>
+                    <p>
+                    <div>
+                        Paste an existing route request here
+                        <textarea id="RequestInput" rows="1" ></textarea><button onclick="parseRequest()">Parse</button>
+                    </div>
+                    </p>
                     <div style="margin: 10px 0px 10px 0px;">
                         <div>Consider layers for routing:</div>
                         <div><input type="checkbox" id="enableTrafficIncidents" onchange="updateParams()">Traffic Incidents</div>
