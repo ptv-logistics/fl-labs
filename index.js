@@ -216,24 +216,26 @@ var setNow = function () {
 
 var updateScenario = function () {
     scenario = $('#scenarioSelect option:selected').val();
+    var wp;
 
     if (scenario === 'New York')
-        routingControl.setWaypoints([
+        wp = [
             L.latLng(40.78263, -74.03331),
             L.latLng(40.71307, -74.00724)
-        ]);
+        ];
     else if (scenario === 'Paris')
-        routingControl.setWaypoints([
+        wp = [
             L.latLng(48.92233, 2.32382),
             L.latLng(48.80220, 2.44454)
-        ]);
+        ];
     else if (scenario === 'Karlsruhe')
-        routingControl.setWaypoints([
+        wp = [
             L.latLng(49.01502, 8.37922),
             L.latLng(49.01328, 8.42806)
-        ]);
+        ];
 
-    routingControl.route();
+    map.fitBounds(wp);
+    routingControl.setWaypoints(wp);
 };
 
 var updateParams = function (refreshFeatureLayer) {
@@ -407,5 +409,6 @@ var parseRequest = function () {
 //            return merctoLatLng(d.coords[0].point.x, d.coords[0].point.y);
         });
 
+    map.fitBounds(wp);
     routingControl.setWaypoints(wp);
 };
