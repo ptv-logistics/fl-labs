@@ -181,7 +181,9 @@ map.on('layeradd', _onLayerAdd, this);
 map.on('layerremove', _onLayerRemove, this);
 
 // update ui
-$('#range').attr('value', hour.format());
+//$('#range').attr('value', hour.format());
+flatpickr('#range', { enableTime: true, defaultDate: hour.format('YYYY-MM-DD HH:mm')});
+$('#utc').val(hour.utcOffset() / 60);
 $('#enableSpeedPatterns').attr('checked', enableSpeedPatterns);
 $('#enableRestrictionZones').attr('checked', enableRestrictionZones);
 $('#enableTrafficIncidents').attr('checked', enableTrafficIncidents);
@@ -205,12 +207,16 @@ var buildProfile = function () {
     template = template.replace('{enableSpeedPatterns}', enableSpeedPatterns);
     template = template.replace('{enableTruckAttributes}', enableTruckAttributes);
     template = template.replace('{enableTrafficIncidents}', enableTrafficIncidents);
+    if(routingProfile.includes('truck'))
+        template = template.replace('PTV_SpeedPatterns', 'PTV_TruckSpeedPatterns');
 
     return template;
 };
 
 var setNow = function () {
-    $('#range').val(moment().format());
+    var tmp = moment();
+    tmp.utcOffset($('#utc').val() * 60, false);
+    flatpickr('#range', { enableTime: true, defaultDate: tmp.format('YYYY-MM-DD HH:mm')});
     updateParams(true);
 };
 
@@ -240,6 +246,7 @@ var updateScenario = function () {
 
 var updateParams = function (refreshFeatureLayer) {
     hour = moment($('#range').val());
+    hour.utcOffset($('#utc').val() * 60, true);
     enableSpeedPatterns = $('#enableSpeedPatterns').is(':checked');
     enableRestrictionZones = $('#enableRestrictionZones').is(':checked');
     enableTruckAttributes = $('#enableTruckAttributes').is(':checked');

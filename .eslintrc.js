@@ -22,7 +22,10 @@ module.exports = {
         ]
     },
     "globals": {
+        "$": true,
         "L": true,
+        "moment": true,
+        "flatpickr": true,
         "d3": true,
         "module": false,
         "define": false
