@@ -4,7 +4,7 @@
 L.PtvLayer = L.NonTiledLayer.extend({
     defaultXMapParams: {
         format: 'PNG',
-        token: '', 
+        token: '',
         markerIsBalloon: false
     },
 
@@ -22,8 +22,8 @@ L.PtvLayer = L.NonTiledLayer.extend({
 
         for (var i in options) {
             // all keys that are not PtvLayerTiledLayer options go to xMap params
-			if (!L.NonTiledLayer.prototype.options.hasOwnProperty(i) && 
-            !(L.Layer && L.Layer.prototype.options.hasOwnProperty(i))) {
+            if (!L.NonTiledLayer.prototype.options.hasOwnProperty(i) &&
+                !(L.Layer && L.Layer.prototype.options.hasOwnProperty(i))) {
                 xMapParams[i] = options[i];
             }
         }
@@ -31,7 +31,7 @@ L.PtvLayer = L.NonTiledLayer.extend({
         this.xMapParams = xMapParams;
 
         // set max bounds xMapServer can handle
-        if(!options.bounds)
+        if (!options.bounds)
             options.bounds = L.latLngBounds([-66.50, -180], [85.05, 180]);
 
         L.NonTiledLayer.prototype.initialize.call(this, options);
@@ -51,13 +51,13 @@ L.PtvLayer = L.NonTiledLayer.extend({
                 className: 'poi-icon',
                 backgroud: '#000',
                 iconSize: [16, 16],
-                iconAnchor: this.options.markerIsBalloon? [8, 16] : [8,8],
-                popupAnchor: this.options.markerIsBalloon? [0, -8] : [0, 0]
+                iconAnchor: this.options.markerIsBalloon ? [8, 16] : [8, 8],
+                popupAnchor: this.options.markerIsBalloon ? [0, -8] : [0, 0]
             });
 
             for (var i = 0; i < objects.length; i++) {
                 var tooltip = this._formatTooltip(objects[i].descr);
-                var id = this._getId? this._getId(objects[i]) : null;
+                var id = this._getId ? this._getId(objects[i]) : null;
 
                 if (objects[i].geometry) {
                     var lineString = [];
@@ -66,7 +66,7 @@ L.PtvLayer = L.NonTiledLayer.extend({
                         var g = this._map.containerPointToLatLng([p.x, p.y]);
                         lineString[j] = [g.lat, g.lng];
                     }
-    
+
                     // create a transparent polyline from an arrays of LatLng points and bind it to the popup
                     var polyline = L.polyline(lineString, {
                         color: 'white',
@@ -79,7 +79,7 @@ L.PtvLayer = L.NonTiledLayer.extend({
                     if (this._getId) {
                         if ('p' + id === this.lastOpenPopupId)
                             polyline.openPopup();
-    
+
                         polyline.tag = id;
                         polyline.on('popupopen', function (e) {
                             that.lastOpenPopupId = 'p' + e.target.tag;
@@ -100,7 +100,7 @@ L.PtvLayer = L.NonTiledLayer.extend({
                 if (this._getId) {
                     if ('m' + id === this.lastOpenPopupId)
                         marker.openPopup();
-    
+
                     marker.tag = id;
                     marker.on('popupopen', function (e) {
                         that.lastOpenPopupId = 'm' + e.target.tag;
@@ -114,7 +114,7 @@ L.PtvLayer = L.NonTiledLayer.extend({
     },
 
     lastOpenPopupId: '',
-    
+
     _getId: function (objectInfo) {
         return objectInfo.descr + objectInfo.ref.point.x + objectInfo.ref.point.y;
     },
@@ -122,10 +122,9 @@ L.PtvLayer = L.NonTiledLayer.extend({
     _formatTooltip: function (description) {
         var toolTip = '';
         var attributes = description.split('|');
-        for(var i = 0; i < attributes.length; i++)
-        {
+        for (var i = 0; i < attributes.length; i++) {
             // add linebreak for multiline
-            if(toolTip.length > 0)
+            if (toolTip.length > 0)
                 toolTip = toolTip + '<br>';
 
             // get attirbute name and value
@@ -133,38 +132,37 @@ L.PtvLayer = L.NonTiledLayer.extend({
 
             // could filter attributes to display here
             // if(tootipAttributes.includes(keyval[0])
-            
+
             var attributeName = keyval[0];
             var attributeValue = keyval[1];
-            switch(attributeName)
-            {
-            case 'length': // TI traffic jam length
-                attributeValue = this.options.imperial
-                ? new Intl.NumberFormat().format(keyval[1] / 1000 / 1.609344) + ' mi'
-                : new Intl.NumberFormat().format(keyval[1] / 1000) + ' km';
-                break;
-            case 'maxWeight': //TA weight
-            case 'maxAxleLoad': //TA weight
-                attributeValue = this.options.imperial
-                ? new Intl.NumberFormat().format(Math.round(keyval[1] / 45.3592) * 100)  + ' lb'
-                : new Intl.NumberFormat().format(keyval[1]) + ' kg';
-                break;
-            case 'maxHeight': //TA length
-            case 'maxWidth': //TA length
-            case 'maxLength': //TA length
-                attributeValue = this.options.imperial
-                ? Intl.NumberFormat().format(Math.round(keyval[1] / 2.54)) + ' in'
-                : Intl.NumberFormat().format(keyval[1]) + ' m';
-            break;
+            switch (attributeName) {
+                case 'length': // TI traffic jam length
+                    attributeValue = this.options.imperial ?
+                        new Intl.NumberFormat().format(keyval[1] / 1000 / 1.609344) + ' mi' :
+                        new Intl.NumberFormat().format(keyval[1] / 1000) + ' km';
+                    break;
+                case 'maxWeight': //TA weight
+                case 'maxAxleLoad': //TA weight
+                    attributeValue = this.options.imperial ?
+                        new Intl.NumberFormat().format(Math.round(keyval[1] / 45.3592) * 100) + ' lb' :
+                        new Intl.NumberFormat().format(keyval[1]) + ' kg';
+                    break;
+                case 'maxHeight': //TA length
+                case 'maxWidth': //TA length
+                case 'maxLength': //TA length
+                    attributeValue = this.options.imperial ?
+                        Intl.NumberFormat().format(Math.round(keyval[1] / 2.54)) + ' in' :
+                        Intl.NumberFormat().format(keyval[1]) + ' m';
+                    break;
             }
 
             // build the tooltip line, could also localize field name here
-            toolTip = toolTip + attributeName + ': ' + attributeValue; 
+            toolTip = toolTip + attributeName + ': ' + attributeValue;
         }
 
         return toolTip;
     },
-    
+
     pixToLatLng: function (world1, world2, width, height, point) {
         var m1 = this.latLngToMercator(world1);
         var m2 = this.latLngToMercator(world2);
@@ -299,13 +297,13 @@ L.PtvLayer = L.NonTiledLayer.extend({
             'includeImageInResponse': true,
             'callerContext': {
                 'properties': [{
-                    'key': 'Profile',
-                    'value': 'ajax-av'
-                },
-                {
-                    'key': 'CoordFormat',
-                    'value': 'OG_GEODECIMAL'
-                }
+                        'key': 'Profile',
+                        'value': 'ajax-av'
+                    },
+                    {
+                        'key': 'CoordFormat',
+                        'value': 'OG_GEODECIMAL'
+                    }
                 ]
             }
         };
@@ -345,10 +343,10 @@ L.PtvLayer.POI = L.PtvLayer.extend({
 
     getRequest: function (world1, world2, width, height) {
         var request = L.PtvLayer.prototype.getRequest.call(this, world1, world2, width, height);
-        
+
         request.layers = [{
             '$type': 'SMOLayer',
-            'name': 'default.points-of-interest' + (this.options.filter? ';' + this.options.filter : ''),
+            'name': 'default.points-of-interest' + (this.options.filter ? ';' + this.options.filter : ''),
             'visible': true,
             'objectInfos': 'REFERENCEPOINT'
         }];
@@ -421,7 +419,7 @@ L.PtvLayer.TrafficInformation.Mgi = L.PtvLayer.TrafficInformation.extend({
         var fields = description.split('#')[1].split('!!!xxx;;;');
 
         // 'EN' is the default language
-        var language = this.options.language? this.options.language.toUpperCase() : 'EN';
+        var language = this.options.language ? this.options.language.toUpperCase() : 'EN';
 
         // the supported languages
         var languages = ['DE', 'EN', 'FR', 'NL', 'IT'];
@@ -443,18 +441,18 @@ L.PtvLayer.TruckAttributes = L.PtvLayer.extend({
     getRequest: function (world1, world2, width, height) {
         var request = L.PtvLayer.prototype.getRequest.call(this, world1, world2, width, height);
         request.layers = [{
-            '$type': 'RoadEditorLayer',
-            'name': 'truckattributes',
-            'visible': true,
-            'objectInfos': 'FULLGEOMETRY'
-        },
-        {
-            '$type': 'StaticPoiLayer',
-            'name': 'street',
-            'visible': 'true',
-            'category': -1,
-            'detailLevel': 0
-        }
+                '$type': 'RoadEditorLayer',
+                'name': 'truckattributes',
+                'visible': true,
+                'objectInfos': 'FULLGEOMETRY'
+            },
+            {
+                '$type': 'StaticPoiLayer',
+                'name': 'street',
+                'visible': 'true',
+                'category': -1,
+                'detailLevel': 0
+            }
         ];
         request.callerContext.properties[0].value = 'truckattributes';
 
@@ -672,7 +670,22 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
         L.TileLayer.prototype.onRemove.call(this, map);
     },
 
-    _resetQueue: function() {
+    _setView: function (center, zoom, noPrune, noUpdate) {
+        // var tileZoom = Math.round(zoom);
+        // if ((this.options.maxZoom !== undefined && tileZoom > this.options.maxZoom) ||
+        //     (this.options.minZoom !== undefined && tileZoom < this.options.minZoom)) {
+        //     tileZoom = undefined;
+        // }
+
+        // var tileZoomChanged = this.options.updateWhenZooming && (tileZoom !== this._tileZoom);
+
+        // if (tileZoomChanged)
+            this._resetQueue();
+
+        L.TileLayer.prototype._setView.call(this, center, zoom, noPrune, noUpdate);
+    },
+
+    _resetQueue: function () {
         this.requestQueue = [];
         this.cnt = this.cnt + 1;
         for (var i = 0; i < this.currentRequests.length; i++)
@@ -783,14 +796,6 @@ L.PtvLayer.FeatureLayerFg = L.PtvLayer.NonTiled.extend({
     },
     type: 'FeatureLayerFg'
 });
-
-function escapeRegExp(string) {
-    return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
-}
-
-function replaceAll(string, find, replace) {
-    return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
-}
 
 L.PtvLayer.FeatureLayerBg = L.PtvLayer.Tiled.extend({
     initialize: function (url, options) { // (String, Object)
