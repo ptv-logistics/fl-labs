@@ -671,15 +671,15 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
     },
 
     _setView: function (center, zoom, noPrune, noUpdate) {
-        // var tileZoom = Math.round(zoom);
-        // if ((this.options.maxZoom !== undefined && tileZoom > this.options.maxZoom) ||
-        //     (this.options.minZoom !== undefined && tileZoom < this.options.minZoom)) {
-        //     tileZoom = undefined;
-        // }
+        var tileZoom = Math.round(zoom);
+        if ((this.options.maxZoom !== undefined && tileZoom > this.options.maxZoom) ||
+            (this.options.minZoom !== undefined && tileZoom < this.options.minZoom)) {
+            tileZoom = undefined;
+        }
 
-        // var tileZoomChanged = this.options.updateWhenZooming && (tileZoom !== this._tileZoom);
+        var tileZoomChanged = this.options.updateWhenZooming && (tileZoom !== this._tileZoom);
 
-        // if (tileZoomChanged)
+        if (tileZoomChanged)
             this._resetQueue();
 
         L.TileLayer.prototype._setView.call(this, center, zoom, noPrune, noUpdate);
