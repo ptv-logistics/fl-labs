@@ -151,8 +151,10 @@ L.PtvLayer = L.NonTiledLayer.extend({
                 case 'maxWidth': //TA length
                 case 'maxLength': //TA length
                     attributeValue = this.options.imperial ?
-                        Intl.NumberFormat().format(Math.round(keyval[1] / 2.54)) + ' in' :
-                        Intl.NumberFormat().format(keyval[1]) + ' m';
+                        attributeName === 'maxLength' ? 
+                            Intl.NumberFormat().format(Math.round(keyval[1] / 0.3048)) + ' ft' :
+                            Intl.NumberFormat().format(Math.round(keyval[1] / 2.54)) + ' in' :
+                        Intl.NumberFormat().format(keyval[1] / 100) + ' m';
                     break;
             }
 
