@@ -393,10 +393,11 @@ var routingControl = L.Routing.control({
     collapsible: true
 }).addTo(map);
 
+L.Routing.errorControl(routingControl).addTo(map);
+
 routingControl.on('routingerror', function (e) {
     responses = [];
     replay();
-    alert(e.error.responseJSON.errorMessage);
 });
 
 updateScenario();

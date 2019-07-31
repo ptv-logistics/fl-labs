@@ -30,7 +30,7 @@ L.Routing.Ptv = L.Class.extend({
         }
         var cnt = 0;
         this.currentRouteIdx++;
-        hasError = false;
+        var hasError = false;
 
         for (var i = 0; i <= this.options.numberOfAlternatives; i++) {
             (function (t, ii) {
@@ -58,14 +58,17 @@ L.Routing.Ptv = L.Class.extend({
                         hasError = true;
 
                         console.log(xhr);
-                        callback.call(context, xhr, null);
+                        callback.call(context, {
+                            status: -1,
+                            message: xhr.responseJSON.errorMessage
+                        });
                     });
             })(this, i);
         }
     },
 
     _routeDone: function (responses, inputWaypoints, callback, context) {
-        alts = [];
+        var alts = [];
         for (var i = 0; i < responses.length; i++) {
             var response = responses[i];
 
