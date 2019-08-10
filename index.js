@@ -13,7 +13,7 @@ var itineraryLanguage = 'EN';
 var routingProfile = 'truckfast';
 var replaySpeed = 100;
 var responses = null;
-var doLoop = false;
+var doLoop = true;
 var scenario = 'New York';
 var useImperial = false;
 
