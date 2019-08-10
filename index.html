@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <title>Feature Layer Labs</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen@1.4.3/Control.FullScreen.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
     <link rel="stylesheet" href="https://unpkg.com/sidebar-v2@0.4.0/css/leaflet-sidebar.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-contextmenu@1.4.0/dist/leaflet.contextmenu.min.css">
@@ -106,25 +107,12 @@
                             <option>Karlsruhe</option>
                         </select>
                     </p>
-                    <p>
-                    <div>
-                        Paste an xRoute request here and extract the coordinates
-                        <textarea id="RequestInput" rows="1" ></textarea><button onclick="parseRequest()">Parse</button>
-                    </div>
-                    </p>
                     <div style="margin: 10px 0px 10px 0px;">
                         <div>Consider layers for routing:</div>
                         <div><input type="checkbox" id="enableTrafficIncidents" onchange="updateParams()">Traffic Incidents</div>
                         <div><input type="checkbox" id="enableSpeedPatterns" onchange="updateParams()">Speed Patterns</div>
                         <div><input type="checkbox" id="enableTruckAttributes" onchange="updateParams()">Truck Attributes</div>
                         <div><input type="checkbox" id="enableRestrictionZones" onchange="updateParams()">Restriction Zones</div>
-                    </div>
-                    <div style="margin: 10px 0px 10px 0px;">
-                        <div>Select time of day</div>
-                            <input id="range" type="text" style="width:120" onchange="updateParams(true)" />
-                            <label for="utc">Z</label>
-                            <input id="utc" type="number" onchange="updateParams(true)" style="width:32px" />
-                        <button onclick="setNow()">Now</button>
                     </div>
                     <div style="margin: 10px 0px 10px 0px;">
                         Routing Profile
@@ -140,6 +128,14 @@
                             <option>pedestrian</option>
                         </select>
                     </div>
+                    <div style="margin: 10px 0px 10px 0px;">
+                        <div>Select time of day</div>
+                            <input id="range" type="text" style="width:120" onchange="updateParams(true)" />
+                            <label for="utc">Z</label>
+                            <input id="utc" type="number" onchange="updateParams(true)" style="width:32px" />
+                        <button onclick="setNow()">Now</button>
+                    </div>
+                    <p>
                     <div style="margin: 10px 0px 10px 0px;">
                         Itinerary Language
                         <select id="languageSelect" onchange="updateParams()">
@@ -165,7 +161,6 @@
                             <option>PT</option>
                         </select>
                     </div>                                            
-                    </p>
                         <div><input type="checkbox" id="useImperial" onchange="updateParams(true)">Show imperial units</div>
                     </p>
                     <div><input type="checkbox" id="dynamicTimeOnStaticRoute" onchange="updateParams(false)">Show static Route
@@ -193,6 +188,12 @@
                         <button onclick="replay()">Replay</button>
                         <input type="checkbox" id="doLoop" onchange="replay()">Loop
                     </div>
+                    <p>
+                        <div>
+                            Paste an xRoute request here and extract the coordinates
+                            <textarea id="RequestInput" rows="1" ></textarea><button onclick="parseRequest()">Parse</button>
+                        </div>
+                    </p>
                 </div>
             </div>
             <div class="sidebar-pane" id="about">
@@ -232,6 +233,7 @@
 
     <script src="https://unpkg.com/jquery@3.2.1/dist/jquery.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.fullscreen@1.4.3/Control.FullScreen.js"></script>
     <script src="https://unpkg.com/leaflet.nontiledlayer@1.0.7/dist/NonTiledLayer.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder@1.8.3/dist/Control.Geocoder.js"></script>

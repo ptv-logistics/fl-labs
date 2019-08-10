@@ -19,9 +19,12 @@ var useImperial = false;
 
 var map = L.map('map', {
     minZoom: 6,
-    zoomControl: false,
     contextmenu: true,
     contextmenuWidth: 200,
+    fullscreenControl: true,
+    fullscreenControlOptions: {
+        fullscreenElement: document.getElementById('map').parentNode // needed for sidebar!
+    },
     contextmenuItems: [{
         text: 'Add Waypoint At Start',
         callback: function (ev) {
