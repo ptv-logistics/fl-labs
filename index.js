@@ -126,9 +126,8 @@ L.control.layers(baseLayers, {
     position: 'topleft'
 }).addTo(map);
 
-new L.Control.Zoom({
-    position: 'bottomleft'
-}).addTo(map);
+// add scale control
+L.control.scale().addTo(map);
 
 var indSelf = false;
 
