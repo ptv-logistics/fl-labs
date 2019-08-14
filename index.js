@@ -184,7 +184,10 @@ map.on('layerremove', _onLayerRemove, this);
 
 // update ui
 //$('#range').attr('value', hour.format());
-flatpickr('#range', { enableTime: true, defaultDate: hour.format('YYYY-MM-DD HH:mm')});
+flatpickr('#range', {
+    enableTime: true,
+    defaultDate: hour.format('YYYY-MM-DD HH:mm')
+});
 $('#utc').val(hour.utcOffset() / 60);
 $('#enableSpeedPatterns').attr('checked', enableSpeedPatterns);
 $('#enableRestrictionZones').attr('checked', enableRestrictionZones);
@@ -202,23 +205,55 @@ $('#scenarioSelect').val(scenario);
 var sidebar = L.control.sidebar('sidebar').addTo(map);
 sidebar.open('home');
 
-var buildProfile = function () {
-    var template = '<Profile xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><FeatureLayer majorVersion=\"1\" minorVersion=\"0\"><GlobalSettings enableTimeDependency=\"true\"/><Themes><Theme id=\"PTV_RestrictionZones\" enabled=\"{enableRestrictionZones}\" priorityLevel=\"0\"></Theme><Theme id=\"PTV_SpeedPatterns\" enabled=\"{enableSpeedPatterns}\" priorityLevel=\"0\"/><Theme id=\"PTV_TrafficIncidents\" enabled=\"{enableTrafficIncidents}\" priorityLevel=\"0\"/><Theme id=\"PTV_TruckAttributes\" enabled=\"{enableTruckAttributes}\" priorityLevel=\"0\"/><Theme id=\"PTV_TimeZones\" enabled=\"true\" priorityLevel=\"0\"/></Themes></FeatureLayer><Routing majorVersion=\"2\" minorVersion=\"0\"><Course><AdditionalDataRules enabled=\"true\"/></Course></Routing></Profile>';
+var buildProfile = function (useFeatureLayers) {
+    if (useFeatureLayers) {
+        var themeSnippet = '<FeatureLayer majorVersion="1" minorVersion="0"><GlobalSettings enableTimeDependency="true"/><Themes>';
 
-    template = template.replace('{enableRestrictionZones}', enableRestrictionZones);
-    template = template.replace('{enableSpeedPatterns}', enableSpeedPatterns);
-    template = template.replace('{enableTruckAttributes}', enableTruckAttributes);
-    template = template.replace('{enableTrafficIncidents}', enableTrafficIncidents);
-    if(routingProfile.includes('truck'))
-        template = template.replace('PTV_SpeedPatterns', 'PTV_TruckSpeedPatterns');
+        var buildThemeSnippet = function (themeName) {
+            return '<Theme id="' + themeName + '" enabled="true" priorityLevel="0"></Theme>';
+        };
 
-    return template;
+        themeSnippet = themeSnippet.concat(buildThemeSnippet('PTV_TimeZones'));
+
+        if (enableRestrictionZones)
+            themeSnippet = themeSnippet.concat(buildThemeSnippet('PTV_RestrictionZones'));
+        if (enableSpeedPatterns)
+            themeSnippet = themeSnippet.concat(buildThemeSnippet('PTV_SpeedPatterns'));
+        if (enableTrafficIncidents)
+            themeSnippet = themeSnippet.concat(buildThemeSnippet('PTV_TrafficIncidents'));
+        if (enableTruckAttributes)
+            themeSnippet = themeSnippet.concat(buildThemeSnippet('PTV_TruckAttributes'));
+        if(routingProfile.includes('truck'))
+            themeSnippet = themeSnippet.replace('PTV_SpeedPatterns', 'PTV_TruckSpeedPatterns');
+    
+        themeSnippet = themeSnippet.concat('</Themes></FeatureLayer>');
+    }
+
+    var customProfile = document.getElementById('ProfileInput').value;
+    if (customProfile) {
+        if(!customProfile.includes('<FeatureLayer'))
+        {
+            // use FeatureLayers form UI
+            var i = customProfile.indexOf('</Profile>');
+            var s = customProfile.substring(customProfile, i) + themeSnippet + customProfile.substring(i);
+            return s;    
+        }
+        else 
+            return customProfile;
+    } else
+        return '<Profile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
+            '<Routing majorVersion="2" minorVersion="0"><Course><AdditionalDataRules enabled="true"/></Course></Routing>'
+            + themeSnippet +
+            '</Profile>';
 };
 
 var setNow = function () {
     var tmp = moment();
     tmp.utcOffset($('#utc').val() * 60, false);
-    flatpickr('#range', { enableTime: true, defaultDate: tmp.format('YYYY-MM-DD HH:mm')});
+    flatpickr('#range', {
+        enableTime: true,
+        defaultDate: tmp.format('YYYY-MM-DD HH:mm')
+    });
     updateParams(true);
 };
 
@@ -285,9 +320,8 @@ var updateParams = function (refreshFeatureLayer) {
     indSelf = false;
 
     if (refreshFeatureLayer) {
-        map.eachLayer(function(layer){
-            if(layer.options.profile)
-            {
+        map.eachLayer(function (layer) {
+            if (layer.options.profile) {
                 layer.options.imperial = useImperial;
                 layer.redraw(map);
             }
@@ -295,7 +329,7 @@ var updateParams = function (refreshFeatureLayer) {
     }
 
     routingControl._router.options.numberOfAlternatives = ((dynamicTimeOnStaticRoute) ? 1 : 0) + ((staticTimeOnStaticRoute) ? 1 : 0);
-    routingControl._formatter.options.units = useImperial? 'imperial' : 'metric';
+    routingControl._formatter.options.units = useImperial ? 'imperial' : 'metric';
     routingControl.route();
 
 };
@@ -356,11 +390,10 @@ var routingControl = L.Routing.control({
                 value: itineraryLanguage
             });
 
-            if (idx == 0 || (idx == 1 && dynamicTimeOnStaticRoute))
-                request.callerContext.properties.push({
-                    key: 'ProfileXMLSnippet',
-                    value: buildProfile()
-                });
+            request.callerContext.properties.push({
+                key: 'ProfileXMLSnippet',
+                value: buildProfile(idx === 0 || idx === 1 && dynamicTimeOnStaticRoute)
+            });
 
             request.callerContext.properties.push({
                 key: 'Profile',
@@ -387,11 +420,11 @@ var routingControl = L.Routing.control({
         }
     }),
     formatter: new L.Routing.Formatter({
-//        roundingSensitivity: 1,
-        units: useImperial? 'imperial' : 'metric'
+        //        roundingSensitivity: 1,
+        units: useImperial ? 'imperial' : 'metric'
     }),
     routeWhileDragging: false,
-    routeDragInterval:  1000,
+    routeDragInterval: 1000,
     collapsible: true
 }).addTo(map);
 
@@ -404,10 +437,10 @@ routingControl.on('routingerror', function (e) {
 
 updateScenario();
 
-var merctoLatLng = function (x ,y) {
+var merctoLatLng = function (x, y) {
     return L.latLng(
         (360 / Math.PI) * (Math.atan(Math.exp(y / 6371000.0)) - (Math.PI / 4)),
-        (180.0 / Math.PI) * (x / 6371000.0));    
+        (180.0 / Math.PI) * (x / 6371000.0));
 };
 
 var parseRequest = function () {
@@ -418,11 +451,14 @@ var parseRequest = function () {
             .map(function (d) {
                 return L.latLng(d.coords[0].point.y, d.coords[0].point.x);
             });
-    
+
         map.fitBounds(wp);
         routingControl.setWaypoints(wp);
-    }
-    catch (ex) {
+    } catch (ex) {
         alert(ex);
     }
+};
+
+var route = function () {
+    routingControl.route();
 };

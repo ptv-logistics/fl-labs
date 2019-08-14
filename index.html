@@ -87,6 +87,7 @@
         <!-- Nav tabs -->
         <ul class="sidebar-tabs" role="tablist">
             <li><a href="#home" role="tab"><i class="fa fa-flag"></i></a></li>
+            <li><a href="#profile" role="tab"><i class="fa fa-tachometer"></i></a></li>
             <li><a href="#about" role="tab"><i class="fa fa-info"></i></a></li>
         </ul>
         <!-- Tab panes -->
@@ -126,6 +127,12 @@
                             <option>bicycle</option>
                             <option>bicycle-oneway</option>
                             <option>pedestrian</option>
+                            <option>mg-car</option>
+                            <option>mg-trailer-truck</option>
+                            <option>mg-transporter</option>
+                            <option>mg-truck-11.99t</option>
+                            <option>mg-truck-40t</option>
+                            <option>mg-truck-7.5t</option>
                         </select>
                     </div>
                     <div style="margin: 10px 0px 10px 0px;">
@@ -194,6 +201,20 @@
                             <textarea id="RequestInput" rows="1" ></textarea><button onclick="parseRequest()">Parse</button>
                         </div>
                     </p>
+                </div>
+            </div>
+            <div class="sidebar-pane" id="profile">
+                <h3>
+                    You can customize the profile with an XML snippet here.
+                </h3>
+                <h4>
+                    If you don't specify the FeatureLayer section, the settings from the route tab are used.
+                </h4>
+                <div>
+                    <button onclick="route()">Route</button>
+                </div>
+                <div>
+                    <textarea id="ProfileInput" rows="50" style="width:100%;"></textarea>    
                 </div>
             </div>
             <div class="sidebar-pane" id="about">
