@@ -13,15 +13,18 @@ var itineraryLanguage = 'EN';
 var routingProfile = 'truckfast';
 var replaySpeed = 100;
 var responses = null;
-var doLoop = false;
+var doLoop = true;
 var scenario = 'New York';
 var useImperial = false;
 
 var map = L.map('map', {
     minZoom: 6,
-    zoomControl: false,
     contextmenu: true,
     contextmenuWidth: 200,
+    fullscreenControl: true,
+    fullscreenControlOptions: {
+        fullscreenElement: document.getElementById('map').parentNode // needed for sidebar!
+    },
     contextmenuItems: [{
         text: 'Add Waypoint At Start',
         callback: function (ev) {
@@ -123,9 +126,8 @@ L.control.layers(baseLayers, {
     position: 'topleft'
 }).addTo(map);
 
-new L.Control.Zoom({
-    position: 'bottomleft'
-}).addTo(map);
+// add scale control
+L.control.scale().addTo(map);
 
 var indSelf = false;
 
