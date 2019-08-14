@@ -409,14 +409,18 @@ var merctoLatLng = function (x ,y) {
 };
 
 var parseRequest = function () {
-    var x = document.getElementById('RequestInput').value;
-    var r = JSON.parse(x);
-    var wp = r.waypoints
-        .map(function (d) {
-            return L.latLng(d.coords[0].point.y, d.coords[0].point.x);
-//            return merctoLatLng(d.coords[0].point.x, d.coords[0].point.y);
-        });
-
-    map.fitBounds(wp);
-    routingControl.setWaypoints(wp);
+    try {
+        var x = document.getElementById('RequestInput').value;
+        var r = JSON.parse(x);
+        var wp = r.waypoints
+            .map(function (d) {
+                return L.latLng(d.coords[0].point.y, d.coords[0].point.x);
+            });
+    
+        map.fitBounds(wp);
+        routingControl.setWaypoints(wp);
+    }
+    catch (ex) {
+        alert(ex);
+    }
 };
