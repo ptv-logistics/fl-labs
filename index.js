@@ -62,7 +62,7 @@ var replay = function () {
 
 var getLayers = function (profile) {
     //add tile layer
-    var bgLayer = new L.PtvLayer.FeatureLayerBg('https://api-eu-test.cloud.ptvgroup.com', {
+    var bgLayer = new L.PtvLayer.FeatureLayerBg('https://api-test.cloud.ptvgroup.com', {
         token: window.token,
         attribution: attribution,
         profile: profile + '-bg',
@@ -76,7 +76,7 @@ var getLayers = function (profile) {
     });
 
     //add fg layer
-    var fgLayer = new L.PtvLayer.FeatureLayerFg('https://api-eu-test.cloud.ptvgroup.com', {
+    var fgLayer = new L.PtvLayer.FeatureLayerFg('https://api-test.cloud.ptvgroup.com', {
         token: window.token,
         attribution: attribution,
         profile: profile + '-fg',
@@ -347,7 +347,7 @@ var routingControl = L.Routing.control({
             return m;
         },
         geocoder: L.Control.Geocoder.ptv({
-            serviceUrl: 'https://api-eu-test.cloud.ptvgroup.com/xlocate/rs/XLocate/',
+            serviceUrl: 'https://api-test.cloud.ptvgroup.com/xlocate/rs/XLocate/',
             token: window.token
         }),
         reverseWaypoints: true
@@ -369,7 +369,7 @@ var routingControl = L.Routing.control({
     },
     showAlternatives: true,
     router: L.Routing.ptv({
-        serviceUrl: 'https://api-eu-test.cloud.ptvgroup.com/xroute/rs/XRoute/',
+        serviceUrl: 'https://api-test.cloud.ptvgroup.com/xroute/rs/XRoute/',
         token: window.token,
         numberOfAlternatives: ((dynamicTimeOnStaticRoute) ? 1 : 0) + ((staticTimeOnStaticRoute) ? 1 : 0),
         beforeSend: function (request, currentResponses, idx) {

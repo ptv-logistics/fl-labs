@@ -1,3 +1,6 @@
+if(!L.Control.Geocoder)
+    L.Control.Geocoder = {};
+
 L.Control.Geocoder.Ptv = L.Class.extend({
     options: {
         serviceUrl: 'https://xlocate-eu-n-test.cloud.ptvgroup.com/xlocate/rs/XLocate/',
@@ -24,8 +27,13 @@ L.Control.Geocoder.Ptv = L.Class.extend({
             return street + ', ' + city;
     },
 
+    // using standard xLocate geocoding as suggest/autocompletion
+    suggest: function(query, cb, context) {
+        return this.geocode(query, cb, context);
+    },
+
     geocode: function (query, cb, context) {
-        var coord = query.match(new RegExp("^\\s*([-+]?\\d*\\.?\\d*)\\s*,\\s*([-+]?\\d*\\.?\\d*)\\s*$"));
+        var coord = query.match(new RegExp('^\\s*([-+]?\\d*\\.?\\d*)\\s*,\\s*([-+]?\\d*\\.?\\d*)\\s*$'));
         if(coord) {
             var loc = L.latLng(coord[1],coord[2]);
             

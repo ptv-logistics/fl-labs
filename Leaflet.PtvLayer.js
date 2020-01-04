@@ -136,26 +136,26 @@ L.PtvLayer = L.NonTiledLayer.extend({
             var attributeName = keyval[0];
             var attributeValue = keyval[1];
             switch (attributeName) {
-                case 'length': // TI traffic jam length
-                    attributeValue = this.options.imperial ?
-                        new Intl.NumberFormat().format(keyval[1] / 1000 / 1.609344) + ' mi' :
-                        new Intl.NumberFormat().format(keyval[1] / 1000) + ' km';
-                    break;
-                case 'maxWeight': //TA weight
-                case 'maxAxleLoad': //TA weight
-                    attributeValue = this.options.imperial ?
-                        new Intl.NumberFormat().format(Math.round(keyval[1] / 45.3592) * 100) + ' lb' :
-                        new Intl.NumberFormat().format(keyval[1]) + ' kg';
-                    break;
-                case 'maxHeight': //TA length
-                case 'maxWidth': //TA length
-                case 'maxLength': //TA length
-                    attributeValue = this.options.imperial ?
-                        attributeName === 'maxLength' ? 
-                            Intl.NumberFormat().format(Math.round(keyval[1] / 0.3048)) + ' ft' :
-                            Intl.NumberFormat().format(Math.round(keyval[1] / 2.54)) + ' in' :
-                        Intl.NumberFormat().format(keyval[1] / 100) + ' m';
-                    break;
+            case 'length': // TI traffic jam length
+                attributeValue = this.options.imperial ?
+                    new Intl.NumberFormat().format(keyval[1] / 1000 / 1.609344) + ' mi' :
+                    new Intl.NumberFormat().format(keyval[1] / 1000) + ' km';
+                break;
+            case 'maxWeight': //TA weight
+            case 'maxAxleLoad': //TA weight
+                attributeValue = this.options.imperial ?
+                    new Intl.NumberFormat().format(Math.round(keyval[1] / 45.3592) * 100) + ' lb' :
+                    new Intl.NumberFormat().format(keyval[1]) + ' kg';
+                break;
+            case 'maxHeight': //TA length
+            case 'maxWidth': //TA length
+            case 'maxLength': //TA length
+                attributeValue = this.options.imperial ?
+                    attributeName === 'maxLength' ? 
+                        Intl.NumberFormat().format(Math.round(keyval[1] / 0.3048)) + ' ft' :
+                        Intl.NumberFormat().format(Math.round(keyval[1] / 2.54)) + ' in' :
+                    Intl.NumberFormat().format(keyval[1] / 100) + ' m';
+                break;
             }
 
             // build the tooltip line, could also localize field name here
@@ -208,7 +208,7 @@ L.PtvLayer = L.NonTiledLayer.extend({
 
         var request = this.getRequest(world1, world2, width, height);
 
-        this.runRequest(this._url + '/xmap/rs/XMap/renderMapBoundingBox', request, this.xMapParams.token,
+        L.Util.runRequest(this._url + '/xmap/rs/XMap/renderMapBoundingBox', request, this.xMapParams.token,
             function (resp) {
                 var prefixMap = {
                     'iVBOR': 'data:image/png;base64,',
@@ -226,34 +226,6 @@ L.PtvLayer = L.NonTiledLayer.extend({
             function (xhr) {
                 callback(L.Util.emptyImageUrl);
             });
-    },
-
-    // runRequest executes a json request on PTV xServer internet, 
-    // given the url endpoint, the token and the callbacks to be called
-    // upon completion. The error callback is parameterless, the success
-    // callback is called with the object returned by the server. 
-    runRequest: function (url, request, token, handleSuccess, handleError) {
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: JSON.stringify(request),
-
-            headers: function () {
-                var h = {
-                    'Content-Type': 'application/json'
-                };
-                if (token) h['Authorization'] = 'Basic ' + btoa('xtok:' + token);
-                return h;
-            }(),
-
-            success: function (data, status, xhr) {
-                handleSuccess(data);
-            },
-
-            error: function (xhr, status, error) {
-                handleError(xhr);
-            }
-        });
     },
 
     setParams: function (params, noRedraw) {
@@ -299,13 +271,13 @@ L.PtvLayer = L.NonTiledLayer.extend({
             'includeImageInResponse': true,
             'callerContext': {
                 'properties': [{
-                        'key': 'Profile',
-                        'value': 'ajax-av'
-                    },
-                    {
-                        'key': 'CoordFormat',
-                        'value': 'OG_GEODECIMAL'
-                    }
+                    'key': 'Profile',
+                    'value': 'ajax-av'
+                },
+                {
+                    'key': 'CoordFormat',
+                    'value': 'OG_GEODECIMAL'
+                }
                 ]
             }
         };
@@ -443,18 +415,18 @@ L.PtvLayer.TruckAttributes = L.PtvLayer.extend({
     getRequest: function (world1, world2, width, height) {
         var request = L.PtvLayer.prototype.getRequest.call(this, world1, world2, width, height);
         request.layers = [{
-                '$type': 'RoadEditorLayer',
-                'name': 'truckattributes',
-                'visible': true,
-                'objectInfos': 'FULLGEOMETRY'
-            },
-            {
-                '$type': 'StaticPoiLayer',
-                'name': 'street',
-                'visible': 'true',
-                'category': -1,
-                'detailLevel': 0
-            }
+            '$type': 'RoadEditorLayer',
+            'name': 'truckattributes',
+            'visible': true,
+            'objectInfos': 'FULLGEOMETRY'
+        },
+        {
+            '$type': 'StaticPoiLayer',
+            'name': 'street',
+            'visible': 'true',
+            'category': -1,
+            'detailLevel': 0
+        }
         ];
         request.callerContext.properties[0].value = 'truckattributes';
 
@@ -525,14 +497,6 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
 
     url: '',
 
-    maxConcurrentRequests: 6,
-
-    activeRequestCount: 0,
-
-    requestQueue: [],
-
-    currentRequests: [],
-
     initialize: function (url, options) {
         this.url = url;
         L.Util.setOptions(this, options);
@@ -548,26 +512,6 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
 
     createTile: function (coords, done) {
         var tile = document.createElement('img');
-
-        L.DomEvent.on(tile, 'load', L.bind(this._tileOnLoad, this, done, tile));
-        L.DomEvent.on(tile, 'error', L.bind(this._tileOnError, this, done, tile));
-
-        if (this.options.crossOrigin) {
-            tile.crossOrigin = '';
-        }
-
-        /*
-         Alt tag is set to empty string to keep screen readers from reading URL and for compliance reasons
-         http://www.w3.org/TR/WCAG20-TECHS/H67
-        */
-        tile.alt = '';
-
-        /*
-         Set role="presentation" to force screen readers to ignore this
-         https://www.w3.org/TR/wai-aria/roles#textalternativecomputation
-        */
-        tile.setAttribute('role', 'presentation');
-
         var tileSize = this.options.tileSize,
             tileBounds = this._tileCoordsToBounds(coords),
             wbbox = tileBounds;
@@ -643,12 +587,11 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
 
         tile._map = this._map;
         tile._layers = [];
-
-        this.runRequestQ(
+        
+        tile.request = L.Util.runRequest(
             this.url + '/xmap/rs/XMap/renderMapBoundingBox',
             request,
             this.options.token,
-
             function (response) {
                 var prefixMap = {
                     'iVBOR': 'data:image/png;base64,',
@@ -659,107 +602,24 @@ L.PtvLayer.Tiled = L.TileLayer.extend({
                 var rawImage = response.image.rawImage;
 
                 tile.src = prefixMap[rawImage.substr(0, 5)] + rawImage;
+                tile.requst = null; // unset request to abort
+                done(null, tile);
             },
-
-            function (xhr) {});
+            function (xhr) {
+                tile.requst = null; // unset request to abort
+                done(null, tile);
+            }
+        );
 
         return tile;
     },
 
-    onRemove: function (map) {
-        this._resetQueue();
-
-        L.TileLayer.prototype.onRemove.call(this, map);
-    },
-
-    _setView: function (center, zoom, noPrune, noUpdate) {
-        var tileZoom = Math.round(zoom);
-        if ((this.options.maxZoom !== undefined && tileZoom > this.options.maxZoom) ||
-            (this.options.minZoom !== undefined && tileZoom < this.options.minZoom)) {
-            tileZoom = undefined;
-        }
-
-        var tileZoomChanged = this.options.updateWhenZooming && (tileZoom !== this._tileZoom);
-
-        if (tileZoomChanged)
-            this._resetQueue();
-
-        L.TileLayer.prototype._setView.call(this, center, zoom, noPrune, noUpdate);
-    },
-
-    _resetQueue: function () {
-        this.requestQueue = [];
-        this.cnt = this.cnt + 1;
-        for (var i = 0; i < this.currentRequests.length; i++)
-            this.currentRequests[i].abort();
-        this.currentRequests = [];
-
-        this.activeRequestCount = 0;
-    },
-
-    redraw: function () {
-        this._resetQueue();
-
-        L.TileLayer.prototype.redraw.call(this);
-    },
-
-    cnt: 0,
-
-    runRequestQ: function (url, request, token, handleSuccess, handleError, force) {
-        if (!force && this.activeRequestCount >= this.maxConcurrentRequests) {
-            this.requestQueue.push({
-                url: url,
-                request: request,
-                token: token,
-                handleSuccess: handleSuccess,
-                handleError: handleError
-            });
-            return;
-        }
-        if (!force)
-            this.activeRequestCount++;
-
-        var that = this;
-        var cnt = this.cnt;
-
-        var ajaxReq = $.ajax({
-            url: url,
-            type: 'POST',
-            data: JSON.stringify(request),
-
-            headers: function () {
-                var h = {
-                    'Content-Type': 'application/json'
-                };
-                if (token) h['Authorization'] = 'Basic ' + btoa('xtok:' + token);
-                return h;
-            }(),
-
-            success: function (data, status, xhr) {
-                that.currentRequests.splice(that.currentRequests.indexOf(request), 1);
-                if (that.cnt === cnt && that.requestQueue.length) {
-                    var pendingRequest = that.requestQueue.shift();
-                    that.runRequestQ(pendingRequest.url, pendingRequest.request, pendingRequest.token, pendingRequest.handleSuccess, pendingRequest.handleError, true);
-                } else {
-                    that.activeRequestCount--;
-                }
-                handleSuccess(data);
-            },
-
-            error: function (xhr, status, error) {
-                that.currentRequests.splice(that.currentRequests.indexOf(request), 1);
-                if (that.cnt === cnt && that.requestQueue.length) {
-                    var pendingRequest = that.requestQueue.shift();
-                    that.runRequestQ(pendingRequest.url, pendingRequest.request, pendingRequest.token, pendingRequest.handleSuccess, pendingRequest.handleError, true);
-                } else {
-                    that.activeRequestCount--;
-                }
-
-                handleError(xhr);
-            }
-        });
-
-        this.currentRequests.push(ajaxReq);
+    _removeTile: function (key) {
+        var tile = this._tiles[key];
+        if (tile && tile.el && tile.el.request)
+            tile.el.request.abort();
+			
+        return L.TileLayer.prototype._removeTile.call(this, key);
     }
 });
 
@@ -864,3 +724,31 @@ L.PtvLayer.FeatureLayer = L.Layer.extend({
     },
     type: 'FeatureLayer'
 });
+
+// runRequest executes a json request on PTV xServer internet, 
+// given the url endpoint, the token and the callbacks to be called
+// upon completion. The error callback is parameterless, the success
+// callback is called with the object returned by the server. 
+L.Util.runRequest = function (url, request, token, handleSuccess, handleError) {
+    return $.ajax({
+        url: url,
+        type: 'POST',
+        data: JSON.stringify(request),
+
+        headers: function () {
+            var h = {
+                'Content-Type': 'application/json'
+            };
+            if (token) h['Authorization'] = 'Basic ' + btoa('xtok:' + token);
+            return h;
+        }(),
+
+        success: function (data, status, xhr) {
+            handleSuccess(data);
+        },
+
+        error: function (xhr, status, error) {
+            handleError(xhr);
+        }
+    });
+};
