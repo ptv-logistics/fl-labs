@@ -10,6 +10,7 @@ var enableTruckAttributes = false;
 var dynamicTimeOnStaticRoute = true;
 var staticTimeOnStaticRoute = true;
 var itineraryLanguage = 'EN';
+var flLanguage = 'EN';
 var routingProfile = 'truckfast';
 var replaySpeed = 100;
 var responses = null;
@@ -84,11 +85,12 @@ var getLayers = function (profile) {
         imperial: useImperial,
         beforeSend2: function (request) {
             request.mapParams.referenceTime = hour.format();
-            // include time domain for incidents
+            // set language and include time domain for incidents
             if (incidentsLayer.visible)
                 request.callerContext.properties.push({
                     'key': 'ProfileXMLSnippet',
-                    'value': '<Profile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><FeatureLayer majorVersion="1" minorVersion="0"><GlobalSettings enableTimeDependency="true"/><Themes><Theme id="PTV_TrafficIncidents" enabled="true"><FeatureDescription includeTimeDomain="true" /></Theme></Themes></FeatureLayer></Profile>'
+                    'value': '<Profile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><Common language="'+ flLanguage 
+                    + '" majorVersion="1" minorVersion="0"/><FeatureLayer majorVersion="1" minorVersion="0"><GlobalSettings enableTimeDependency="true"/><Themes><Theme id="PTV_TrafficIncidents" enabled="true"><FeatureDescription includeTimeDomain="true" /></Theme></Themes></FeatureLayer></Profile>'
                 });
         }
     });
@@ -197,6 +199,7 @@ $('#dynamicTimeOnStaticRoute').attr('checked', dynamicTimeOnStaticRoute);
 $('#useImperial').attr('checked', useImperial);
 $('#staticTimeOnStaticRoute').attr('checked', staticTimeOnStaticRoute);
 $('#languageSelect').val(itineraryLanguage);
+$('#flLanguage').val(flLanguage);
 $('#routingProfile').val(routingProfile);
 $('#replaySpeed').val(replaySpeed);
 $('#doLoop').attr('checked', doLoop);
@@ -291,6 +294,7 @@ var updateParams = function (refreshFeatureLayer) {
     dynamicTimeOnStaticRoute = $('#dynamicTimeOnStaticRoute').is(':checked');
     staticTimeOnStaticRoute = $('#staticTimeOnStaticRoute').is(':checked');
     itineraryLanguage = $('#languageSelect option:selected').val();
+    flLanguage = $('#flLanguage option:selected').val();
     useImperial = $('#useImperial').is(':checked');
     routingProfile = $('#routingProfile option:selected').val();
 

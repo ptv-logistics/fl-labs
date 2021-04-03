@@ -171,8 +171,18 @@
                             <option>SV</option>
                             <option>PT</option>
                         </select>
+                    </div>  
+                    <div style="margin: 10px 0px 10px 0px;">
+                        incidents Language
+                        <select id="flLanguage" onchange="updateParams(true)">
+                            <option>EN</option>
+                            <option>DE</option>
+                            <option>FR</option>
+                            <option>IT</option>
+                            <option>NL</option>
+                        </select>
                     </div>                                            
-                        <div><input type="checkbox" id="useImperial" onchange="updateParams(true)">Show imperial units</div>
+                    <div><input type="checkbox" id="useImperial" onchange="updateParams(true)">Show imperial units</div>
                     </p>
                     <div><input type="checkbox" id="dynamicTimeOnStaticRoute" onchange="updateParams(false)">Show static Route
                         /w dynamic Time</div>
