@@ -271,8 +271,8 @@ var updateScenario = function () {
         ];
     else if (scenario === 'Paris')
         wp = [
-            L.latLng(48.92233, 2.32382),
-            L.latLng(48.80220, 2.44454)
+            L.latLng(48.89465, 2.18744),
+            L.latLng(48.80313, 2.43364)
         ];
     else if (scenario === 'Karlsruhe')
         wp = [
