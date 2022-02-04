@@ -46,7 +46,7 @@ var map = L.map('map', {
 });
 
 
-var attribution = '&copy; 2021 PTV AG, TomTom';
+var attribution = '&copy; ' + new Date().getFullYear() + ' PTV AG, TomTom';
 
 // create a separate pane for the xmap labels, so they are displayed on top of the route line
 map.createPane('labels');
