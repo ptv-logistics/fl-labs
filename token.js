@@ -1,2 +1,2 @@
-// This token is valid until 2022-06-25T05:02:28Z and was auto-generated @ 2022-04-21T21:39:19Z.
-var token = 'B2B52B12-5271-4079-B0A3-E532C0CD1867';
+// This token is for demo puroposes only. Get you own free token at https://www.ptvgroup.com/en/solutions/products/ptv-xserver/ 
+var token = 'C86E4166-75A5-4B5E-9FAC-8BCDC8A93413'; 
