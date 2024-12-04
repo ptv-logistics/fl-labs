@@ -15,7 +15,7 @@ var routingProfile = 'truckfast';
 var replaySpeed = 100;
 var responses = null;
 var doLoop = true;
-var scenario = 'New York';
+var scenario = 'Paris';
 var useImperial = false;
 
 var map = L.map('map', {
